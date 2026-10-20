@@ -33,6 +33,7 @@ public partial class MainWindow
         menu.Items.Add(Item("Pantalla completa", "", Commands.FullScreen));
         menu.Items.Add(Item("Herramientas para desarrolladores", "", Commands.DevTools));
         menu.Items.Add(new Separator());
+        menu.Items.Add(Item("Configuración", "", Commands.Settings));
         var exit = new MenuItem { Header = "Salir", Icon = Glyph("") };
         exit.Click += (_, _) => SessionManager.ExitAll();
         menu.Items.Add(exit);

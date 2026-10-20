@@ -21,6 +21,7 @@ public static class Commands
     public const string FullScreen = "fullScreen";
     public const string Print = "print";
     public const string Home = "home";
+    public const string Settings = "settings";
     /// <summary>"tab1".."tab8": jump to the n-th tab.</summary>
     public static string GoToTab(int n) => "tab" + n;
 }

@@ -15,6 +15,26 @@ The WebView2 Runtime itself is part of Windows and is not redistributed by Phast
 
 ---
 
+## Microsoft.Data.Sqlite
+
+- Source: https://github.com/dotnet/efcore (package `Microsoft.Data.Sqlite`)
+- License: MIT (https://licenses.nuget.org/MIT)
+- Copyright (c) .NET Foundation and Contributors.
+- Used to store the browsing history.
+
+## SQLitePCLRaw (`SQLitePCLRaw.bundle_e_sqlite3`, `SQLitePCLRaw.core`)
+
+- Source: https://github.com/ericsink/SQLitePCL.raw
+- License: Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+- Copyright (c) Eric Sink and contributors.
+
+## SQLite
+
+- Source: https://www.sqlite.org/
+- License: Public Domain (https://www.sqlite.org/copyright.html)
+
+---
+
 ## Mozilla Readability
 
 - Source: https://github.com/mozilla/readability

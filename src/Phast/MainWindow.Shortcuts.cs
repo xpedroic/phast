@@ -15,6 +15,20 @@ public partial class MainWindow
         if (command != null && Execute(command)) e.Handled = true;
     }
 
+    /// <summary>Switches to a tab already showing the internal page, or opens it in a new tab.</summary>
+    public void OpenInternalPage(string phastUrl)
+    {
+        var real = Core.InternalPages.ToRealUrl(phastUrl);
+        var page = real.Split('#', '?')[0];
+        var existing = Tabs.Tabs.FirstOrDefault(t => t.Url.StartsWith(page, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+        {
+            Tabs.Activate(existing);
+            if (real != page) existing.Navigate(real);
+        }
+        else Tabs.OpenNextToActive(real, activate: true);
+    }
+
     /// <summary>Runs a browser command. Returns false if it does not apply right now.</summary>
     public bool Execute(string command)
     {
@@ -46,7 +60,8 @@ public partial class MainWindow
             case Commands.DevTools: tab?.Core?.OpenDevToolsWindow(); return true;
             case Commands.FullScreen: SetFullScreen(!_isFullScreen); return true;
             case Commands.Print: tab?.Core?.ShowPrintUI(); return true;
-            case Commands.Home: tab?.Navigate(Core.InternalPages.ToRealUrl(Core.InternalPages.NewTab)); return true;
+            case Commands.Settings: OpenInternalPage("phast://settings"); return true;
+            case Commands.Home:tab?.Navigate(Core.InternalPages.ToRealUrl(Core.InternalPages.NewTab)); return true;
         }
 
         if (command.StartsWith("tab", StringComparison.Ordinal) && int.TryParse(command[3..], out var n))

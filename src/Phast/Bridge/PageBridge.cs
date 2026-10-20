@@ -1,5 +1,8 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Phast.Core;
+using Phast.Session;
+using Phast.Settings;
 using Phast.Tabs;
 
 namespace Phast.Bridge;
@@ -8,9 +11,16 @@ namespace Phast.Bridge;
 /// Handles messages sent by Phast's internal pages (phast://newtab, phast://settings...) through
 /// window.chrome.webview.postMessage. Messages are JSON objects: { "type": "...", ...payload }.
 /// Only pages served from https://phast.internal reach this class (checked in BrowserTab).
+/// Replies are posted back as { "type": "...", ... } and received with phast.on(type, cb).
 /// </summary>
 public static class PageBridge
 {
+    public static void Initialize()
+    {
+        // Keep every open settings page in sync (e.g. theme changed from another window).
+        SettingsService.Changed += () => Broadcast(SettingsMessage());
+    }
+
     public static void Handle(BrowserTab tab, string json)
     {
         try
@@ -21,9 +31,16 @@ public static class PageBridge
             switch (type)
             {
                 case "navigate":
-                    var text = root.GetProperty("text").GetString() ?? "";
-                    var url = UrlResolver.Resolve(text);
+                    var url = UrlResolver.Resolve(root.GetProperty("text").GetString() ?? "");
                     if (url != null) tab.Navigate(url);
+                    break;
+
+                case "settings.get":
+                    tab.PostMessage(SettingsMessage());
+                    break;
+
+                case "settings.set":
+                    SettingsService.SetValue(root.GetProperty("key").GetString() ?? "", root.GetProperty("value"));
                     break;
 
                 default:
@@ -35,5 +52,28 @@ public static class PageBridge
         {
             System.Diagnostics.Debug.WriteLine($"Bad page message: {ex.Message}");
         }
+    }
+
+    private static string SettingsMessage()
+    {
+        var msg = new JsonObject
+        {
+            ["type"] = "settings",
+            ["settings"] = SettingsService.ToJson(),
+            ["engines"] = new JsonArray(SearchEngines.All
+                .Select(e => (JsonNode)new JsonObject { ["id"] = e.Id, ["name"] = e.Name }).ToArray()),
+            ["version"] = typeof(PageBridge).Assembly.GetName().Version?.ToString(3),
+            ["engineVersion"] = BrowserEnvironment.RuntimeVersion(),
+        };
+        return msg.ToJsonString();
+    }
+
+    /// <summary>Sends a message to every loaded internal page in every window.</summary>
+    private static void Broadcast(string json)
+    {
+        foreach (var window in SessionManager.Windows)
+            foreach (var tab in window.Tabs.Tabs)
+                if (tab.Core != null && InternalPages.IsInternal(tab.Url))
+                    tab.PostMessage(json);
     }
 }

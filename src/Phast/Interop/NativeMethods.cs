@@ -60,6 +60,13 @@ internal static partial class NativeMethods
     public static partial bool AllowSetForegroundWindow(int processId);
     public const int ASFW_ANY = -1;
 
+    [LibraryImport("user32.dll")]
+    public static partial short GetAsyncKeyState(int vKey);
+
+    /// <summary>True if the left, right or middle mouse button is physically held down right now.</summary>
+    public static bool AnyMouseButtonDown() =>
+        (GetAsyncKeyState(0x01) & 0x8000) != 0 || (GetAsyncKeyState(0x02) & 0x8000) != 0 || (GetAsyncKeyState(0x04) & 0x8000) != 0;
+
     public static int LowWord(IntPtr value) => unchecked((short)(long)value);
     public static int HighWord(IntPtr value) => unchecked((short)((long)value >> 16));
 }

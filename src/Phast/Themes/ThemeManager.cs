@@ -47,7 +47,11 @@ public static class ThemeManager
             ThemeMode.Light => false,
             _ => IsWindowsAppThemeDark(),
         };
-        if (_current != null && dark == IsDark) return;
+        if (_current != null && dark == IsDark)
+        {
+            ThemeChanged?.Invoke(); // palette unchanged, but pages may need a new preferred color scheme
+            return;
+        }
 
         IsDark = dark;
         var dict = new ResourceDictionary { Source = dark ? DarkUri : LightUri };

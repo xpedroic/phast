@@ -16,6 +16,7 @@ namespace Phast;
 public partial class MainWindow : Window
 {
     private readonly WindowFrame _frame;
+    private readonly Omnibox.OmniboxController _omnibox;
     private BrowserTab? _observedTab;
 
     public TabManager Tabs { get; }
@@ -42,6 +43,19 @@ public partial class MainWindow : Window
         MouseDown += OnMouseDown;
         Activated += (_, _) => SessionManager.LastActiveWindow = this;
         InitTabDrag();
+
+        _omnibox = new Omnibox.OmniboxController(AddressBox, SuggestPopup, SuggestList, NavigateFromOmnibox);
+        AddressBox.PreviewTextInput += (_, _) => _lastAddressTyping = DateTime.Now;
+        AddressBox.PreviewKeyDown += (_, e) =>
+        {
+            // Keys that deliberately leave the address bar don't count as "typing".
+            if (e.Key is not (Key.Enter or Key.Escape or Key.Tab)) _lastAddressTyping = DateTime.Now;
+            else _lastAddressTyping = DateTime.MinValue;
+        };
+        // A Popup does not follow its window: close the dropdown whenever the window moves or loses focus.
+        Deactivated += (_, _) => _omnibox.Close();
+        LocationChanged += (_, _) => _omnibox.Close();
+        SizeChanged += (_, _) => _omnibox.Close();
 
         RestoreTabs(restore, urls);
         OnWindowStateChanged();
@@ -170,10 +184,21 @@ public partial class MainWindow : Window
         ReloadButton.ToolTip = loading ? "Detener la carga de esta página" : "Recargar esta página (F5)";
     }
 
+    /// <summary>True while Phast itself is moving focus to the page (so the address bar lets it go).</summary>
+    private bool _pageFocusRequested;
+    /// <summary>Last time the user typed in the address bar.</summary>
+    private DateTime _lastAddressTyping;
+
     private void FocusPage()
     {
         var wv = Tabs.Active?.WebView;
-        if (wv != null) Dispatcher.BeginInvoke(() => wv.Focus(), System.Windows.Threading.DispatcherPriority.Input);
+        if (wv == null) return;
+        _pageFocusRequested = true;
+        Dispatcher.BeginInvoke(() =>
+        {
+            wv.Focus();
+            _pageFocusRequested = false;
+        }, System.Windows.Threading.DispatcherPriority.Input);
     }
 
     // ---------------------------------------------------------------- address bar
@@ -183,7 +208,8 @@ public partial class MainWindow : Window
         var url = Tabs.Active?.Url;
         UpdateSiteIcon(url);
         if (AddressBox.IsKeyboardFocusWithin && !force) return; // don't overwrite what the user is typing
-        AddressBox.Text = AddressBox.IsKeyboardFocusWithin ? UrlResolver.ToDisplay(url) : ShortDisplay(url);
+        _addressLostToOtherWindow = false;
+        _omnibox.SetText(AddressBox.IsKeyboardFocusWithin ? UrlResolver.ToDisplay(url) : ShortDisplay(url));
     }
 
     /// <summary>Chrome hides "https://" and "www." while the address bar is not focused.</summary>
@@ -231,36 +257,87 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>The address bar lost focus because the whole window was deactivated (Alt+Tab...).</summary>
+    private bool _addressLostToOtherWindow;
+
     private void AddressBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
-        AddressBox.Text = UrlResolver.ToDisplay(Tabs.Active?.Url);
+        // Coming back from another window: keep whatever the user was typing, like Chrome.
+        if (_addressLostToOtherWindow)
+        {
+            _addressLostToOtherWindow = false;
+            return;
+        }
+        _omnibox.SetText(UrlResolver.ToDisplay(Tabs.Active?.Url));
         AddressBox.SelectAll();
     }
 
     private void AddressBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
-        AddressBox.Text = ShortDisplay(Tabs.Active?.Url);
+        Log.Write($"Address lost focus -> {e.NewFocus?.GetType().Name ?? "null"} active={IsActive}");
+
+        // A page that finishes loading (or calls focus()) can steal focus from WebView2's host while the
+        // user is typing here. If the user did not click anywhere and was typing a moment ago, take it back.
+        var typingRecently = (DateTime.Now - _lastAddressTyping).TotalSeconds < 3;
+        if (IsActive && typingRecently && !_pageFocusRequested && !NativeMethods.AnyMouseButtonDown()
+            && (e.NewFocus == null || e.NewFocus is Microsoft.Web.WebView2.Wpf.WebView2))
+        {
+            _addressLostToOtherWindow = true; // keep the typed text
+            Dispatcher.BeginInvoke(() =>
+            {
+                AddressBox.Focus();
+                AddressBox.CaretIndex = AddressBox.Text.Length;
+            }, System.Windows.Threading.DispatcherPriority.Input);
+            return;
+        }
+
+        if (e.NewFocus == null || !IsActive)
+        {
+            _addressLostToOtherWindow = true;
+            return;
+        }
+        _addressLostToOtherWindow = false;
+        _omnibox.SetText(ShortDisplay(Tabs.Active?.Url));
         AddressBox.ScrollToHome();
+    }
+
+    /// <summary>Called by the omnibox when the user picks an address, search or suggestion.</summary>
+    private void NavigateFromOmnibox(string url, bool newTab)
+    {
+        Log.Write($"NavigateFromOmnibox {url} newTab={newTab} active={Tabs.Active?.Url}");
+        if (newTab || Tabs.Active == null) Tabs.Open(url);
+        else Tabs.Active.Navigate(url, typed: true);
+        FocusPage();
+    }
+
+    private void Suggestion_MouseEnter(object sender, MouseEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is Omnibox.Suggestion s) _omnibox.Highlight(s);
+    }
+
+    private void Suggestion_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is Omnibox.Suggestion s)
+            _omnibox.OpenSuggestion(s, newTab: Keyboard.Modifiers.HasFlag(ModifierKeys.Control));
+        e.Handled = true;
+    }
+
+    private void Suggestion_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Middle && (sender as FrameworkElement)?.DataContext is Omnibox.Suggestion s)
+        {
+            _omnibox.OpenSuggestion(s, newTab: true);
+            e.Handled = true;
+        }
     }
 
     private void AddressBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
-        {
-            e.Handled = true;
-            var url = UrlResolver.Resolve(AddressBox.Text);
-            if (url == null) return;
-            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt) || Tabs.Active == null)
-                Tabs.Open(url);
-            else
-                Tabs.Active.Navigate(url);
-            FocusPage();
-        }
-        else if (e.Key == Key.Escape)
+        if (e.Key == Key.Escape)
         {
             e.Handled = true;
             var original = UrlResolver.ToDisplay(Tabs.Active?.Url);
-            if (AddressBox.Text != original) { AddressBox.Text = original; AddressBox.SelectAll(); }
+            if (AddressBox.Text != original) { _omnibox.SetText(original); AddressBox.SelectAll(); }
             else FocusPage();
         }
     }

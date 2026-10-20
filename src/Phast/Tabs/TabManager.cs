@@ -36,6 +36,7 @@ public sealed class TabManager : ObservableObject
 
     public BrowserTab Open(string? url, bool activate = true, int? index = null, string? title = null, byte[]? faviconPng = null)
     {
+        Log.Write($"Tab open url={url} activate={activate} index={index}");
         var tab = new BrowserTab(url ?? InternalPages.ToRealUrl(InternalPages.NewTab), title, faviconPng);
         Attach(tab);
         var at = index is int i ? Math.Clamp(i, 0, Tabs.Count) : Tabs.Count;

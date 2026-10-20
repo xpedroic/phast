@@ -16,6 +16,8 @@ public sealed class AppSettings
 
     // Search
     public string SearchEngine { get; set; } = "google";
+    /// <summary>Ask the search engine for suggestions while typing in the address bar.</summary>
+    public bool SearchSuggestions { get; set; } = true;
 
     // Startup
     public StartupMode Startup { get; set; } = StartupMode.RestoreSession;

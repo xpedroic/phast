@@ -40,11 +40,18 @@ public partial class App : Application
         _ = BrowserEnvironment.GetAsync();   // start the engine now, in parallel with the UI
         ThemeManager.Initialize();
         InternalPages.EnsureExtracted();
+        Bridge.PageBridge.Initialize();
 
         SingleInstance.ArgumentsReceived += args =>
             Dispatcher.BeginInvoke(() => SessionManager.HandleExternalLaunch(ParseUrls(args)));
 
         SessionManager.Start(ParseUrls(e.Args));
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        History.HistoryStore.Close();
+        base.OnExit(e);
     }
 
     /// <summary>Command-line arguments that are not switches are treated as URLs / files / searches.</summary>

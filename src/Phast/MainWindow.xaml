@@ -199,5 +199,54 @@
 
         <!-- ===== Web content: one WebView2 per loaded tab, stacked; only the active one is visible ===== -->
         <Grid x:Name="WebHost" Grid.Row="2" Background="{DynamicResource ContentBackgroundBrush}"/>
+
+        <!-- ===== Address bar suggestions dropdown (a Popup, so it floats above the web page) ===== -->
+        <Popup x:Name="SuggestPopup" PlacementTarget="{Binding ElementName=Omnibox}" Placement="Bottom"
+               VerticalOffset="4" HorizontalOffset="-8" AllowsTransparency="True" StaysOpen="True"
+               Focusable="False" PopupAnimation="None">
+            <Border Background="{DynamicResource MenuBrush}" BorderBrush="{DynamicResource MenuBorderBrush}"
+                    BorderThickness="1" CornerRadius="12" Padding="0,6" Margin="8,0,8,10"
+                    Width="{Binding ActualWidth, ElementName=Omnibox}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                </Border.Effect>
+                <ItemsControl x:Name="SuggestList" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="Row" Height="36" Background="Transparent" Cursor="Hand"
+                                    MouseEnter="Suggestion_MouseEnter" MouseLeftButtonDown="Suggestion_MouseDown"
+                                    MouseUp="Suggestion_MouseUp">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                               Foreground="{DynamicResource IconBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               FontSize="14" Margin="0,0,16,0">
+                                        <Run Text="{Binding Text, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/><Run
+                                             x:Name="Dash" Text=" – " Foreground="{DynamicResource TextSecondaryBrush}"/><Run
+                                             x:Name="DetailRun" Text="{Binding Detail, Mode=OneWay}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuHoverBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Detail}" Value="{x:Null}">
+                                    <Setter TargetName="Dash" Property="Text" Value=""/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DetailIsUrl}" Value="True">
+                                    <Setter TargetName="DetailRun" Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </Popup>
     </Grid>
 </Window>

@@ -7,6 +7,7 @@ using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using Phast.Bridge;
 using Phast.Core;
+using Phast.History;
 
 namespace Phast.Tabs;
 
@@ -111,11 +112,20 @@ public sealed class BrowserTab : ObservableObject
         core.Settings.AreDevToolsEnabled = true;
         core.Profile.PreferredColorScheme = Themes.ThemeManager.PreferredScheme;
 
-        core.DocumentTitleChanged += (_, _) => Title = core.DocumentTitle;
+        core.DocumentTitleChanged += (_, _) =>
+        {
+            Title = core.DocumentTitle;
+            HistoryStore.UpdateTitleAsync(core.Source, core.DocumentTitle).Forget();
+        };
         core.SourceChanged += (_, _) => Url = core.Source;
         core.HistoryChanged += (_, _) => { CanGoBack = core.CanGoBack; CanGoForward = core.CanGoForward; };
         core.NavigationStarting += (_, _) => IsLoading = true;
-        core.NavigationCompleted += (_, _) => IsLoading = false;
+        core.NavigationCompleted += (_, e) =>
+        {
+            IsLoading = false;
+            if (e.IsSuccess) HistoryStore.AddVisitAsync(core.Source, core.DocumentTitle, _typedPending).Forget();
+            _typedPending = false;
+        };
         core.FaviconChanged += async (_, _) => await UpdateFaviconAsync();
         core.NewWindowRequested += (_, e) => NewWindowRequested?.Invoke(this, e);
         core.WindowCloseRequested += (_, _) => CloseRequested?.Invoke(this, EventArgs.Empty);
@@ -134,8 +144,12 @@ public sealed class BrowserTab : ObservableObject
         }
     }
 
-    public void Navigate(string url)
+    /// <summary>True when the next navigation was typed in the address bar (ranks higher in suggestions).</summary>
+    private bool _typedPending;
+
+    public void Navigate(string url, bool typed = false)
     {
+        _typedPending = typed;
         Url = url;
         if (Core != null) Core.Navigate(url);
         else _pendingUrl = url;
