@@ -1,0 +1,26 @@
+<!-- Light palette, modeled on Chrome's default light theme. Every UI color comes from here. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="FrameBrush" Color="#DEE1E6"/>
+    <SolidColorBrush x:Key="FrameInactiveBrush" Color="#E8EAED"/>
+    <SolidColorBrush x:Key="ToolbarBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TabHoverBrush" Color="#EAECEF"/>
+    <SolidColorBrush x:Key="TabSeparatorBrush" Color="#9AA0A6"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5F6368"/>
+    <SolidColorBrush x:Key="IconBrush" Color="#474747"/>
+    <SolidColorBrush x:Key="IconDisabledBrush" Color="#BDC1C6"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#14000000"/>
+    <SolidColorBrush x:Key="ButtonPressedBrush" Color="#24000000"/>
+    <SolidColorBrush x:Key="OmniboxBrush" Color="#F1F3F4"/>
+    <SolidColorBrush x:Key="OmniboxHoverBrush" Color="#E8EAED"/>
+    <SolidColorBrush x:Key="OmniboxFocusBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#0B57D0"/>
+    <SolidColorBrush x:Key="SelectionBrush" Color="#A8C7FA"/>
+    <SolidColorBrush x:Key="ToolbarSeparatorBrush" Color="#DADCE0"/>
+    <SolidColorBrush x:Key="MenuBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="MenuHoverBrush" Color="#F1F3F4"/>
+    <SolidColorBrush x:Key="MenuBorderBrush" Color="#DADCE0"/>
+    <SolidColorBrush x:Key="CloseHoverBrush" Color="#C42B1C"/>
+    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#FFFFFF"/>
+</ResourceDictionary>

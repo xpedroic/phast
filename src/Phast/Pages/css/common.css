@@ -1,0 +1,31 @@
+/* Shared look for every internal Phast page. Colors follow the browser theme via prefers-color-scheme. */
+:root {
+  --bg: #ffffff;
+  --surface: #f1f3f4;
+  --surface-hover: #e8eaed;
+  --text: #1f1f1f;
+  --text-2: #5f6368;
+  --accent: #0b57d0;
+  --border: #dadce0;
+  --shadow: 0 1px 6px rgba(32, 33, 36, .28);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #202124;
+    --surface: #303134;
+    --surface-hover: #3c4043;
+    --text: #e8eaed;
+    --text-2: #9aa0a6;
+    --accent: #a8c7fa;
+    --border: #3c4043;
+    --shadow: 0 1px 6px rgba(0, 0, 0, .5);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}

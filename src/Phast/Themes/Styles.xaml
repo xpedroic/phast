@@ -1,0 +1,242 @@
+<!-- Control styles shared by the whole UI. Colors always come from the active palette (Light/Dark.xaml). -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework">
+
+    <FontFamily x:Key="UiFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <!-- Round icon button used in the toolbar (back, forward, reload, menu...). -->
+    <Style x:Key="ToolbarButton" TargetType="Button">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Margin" Value="2,0"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Ellipse x:Name="Bg" Fill="Transparent"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Fill" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Fill" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource IconDisabledBrush}"/>
+                            <Setter TargetName="Bg" Property="Fill" Value="Transparent"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Small round button inside the address bar (star, site info). -->
+    <Style x:Key="OmniboxButton" TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Margin" Value="2,0"/>
+    </Style>
+
+    <!-- Minimize / maximize / close buttons on the title bar. -->
+    <Style x:Key="CaptionButton" TargetType="Button">
+        <Setter Property="Width" Value="46"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+                        <!-- Hover driven from WndProc while Windows shows Snap Layouts. -->
+                        <Trigger Property="Tag" Value="hover">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CaptionCloseButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource CloseHoverBrush}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#94251A"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The little "x" inside each tab. -->
+    <Style x:Key="TabCloseButton" TargetType="Button">
+        <Setter Property="Width" Value="18"/>
+        <Setter Property="Height" Value="18"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
+        <Setter Property="FontSize" Value="8"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Ellipse x:Name="Bg" Fill="Transparent"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Fill" Value="{DynamicResource ButtonHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Fill" Value="{DynamicResource ButtonPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- "+" new tab button next to the tabs. -->
+    <Style x:Key="NewTabButton" TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="6,0,0,0"/>
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+    </Style>
+
+    <!-- Borderless text box used by the address bar. -->
+    <Style x:Key="OmniboxTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource SelectionBrush}"/>
+        <Setter Property="SelectionOpacity" Value="0.6"/>
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                  VerticalAlignment="Center"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Chrome-like popup menu. -->
+    <Style TargetType="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource MenuBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="HasDropShadow" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource MenuBorderBrush}"
+                            BorderThickness="1" CornerRadius="8" Padding="0,6" Margin="0,0,8,8" MinWidth="280">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.25"/>
+                        </Border.Effect>
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Bg" Background="Transparent" Height="32" Padding="16,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter ContentSource="Icon" VerticalAlignment="Center" TextElement.FontFamily="{StaticResource IconFont}" TextElement.FontSize="14"/>
+                            <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                            <TextBlock Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="24,0,0,0"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MenuHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource IconDisabledBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Separator">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1" Margin="0,6" Background="{DynamicResource ToolbarSeparatorBrush}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Small text buttons used in the zoom row of the menu. -->
+    <Style x:Key="MenuInlineButton" TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource MenuBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MenuBorderBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="8,4"/>
+    </Style>
+</ResourceDictionary>

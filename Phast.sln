@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5596672B-433C-4116-89D3-D256F813456B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phast", "src\Phast\Phast.csproj", "{424626AB-98A4-4966-BD34-D4CE108F6106}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{424626AB-98A4-4966-BD34-D4CE108F6106}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{424626AB-98A4-4966-BD34-D4CE108F6106}.Debug|Any CPU.Build.0 = Debug|x64
+		{424626AB-98A4-4966-BD34-D4CE108F6106}.Release|Any CPU.ActiveCfg = Release|x64
+		{424626AB-98A4-4966-BD34-D4CE108F6106}.Release|Any CPU.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{424626AB-98A4-4966-BD34-D4CE108F6106} = {5596672B-433C-4116-89D3-D256F813456B}
+	EndGlobalSection
+EndGlobal

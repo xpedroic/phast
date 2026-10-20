@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Required by source-generated P/Invoke (LibraryImport) in Interop/. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>Phast</RootNamespace>
+    <AssemblyName>Phast</AssemblyName>
+    <ApplicationIcon>Assets\phast.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <Version>0.1.0</Version>
+    <Product>Phast</Product>
+    <Description>A fast, simple and hackable web browser for Windows</Description>
+    <Copyright>Copyright (c) 2026 xpedroic — PolyForm Noncommercial 1.0.0</Copyright>
+
+    <!-- Startup performance -->
+    <TieredPGO>true</TieredPGO>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en;es</SatelliteResourceLanguages>
+    <!-- Don't ship the XML API docs of NuGet packages. -->
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
+    <AllowedReferenceRelatedFileExtensions>.pdb</AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\phast.ico" />
+    <!-- Internal pages (phast://...) are embedded and extracted on first run, so the app stays a single .exe. -->
+    <EmbeddedResource Include="Pages\**\*" LogicalName="Pages/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
