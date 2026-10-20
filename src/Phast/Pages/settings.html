@@ -21,6 +21,7 @@
     <nav id="nav">
       <a href="#appearance"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>Apariencia</a>
       <a href="#search"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>Buscador</a>
+      <a href="#bookmarks"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15-5-2.18L7 18V5h10v13z"/></svg>Marcadores e importar</a>
       <a href="#startup"><svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17-1.42 1.42A6.92 6.92 0 0 1 19 12c0 3.87-3.13 7-7 7a7 7 0 0 1-4.42-12.42L6.17 5.17A8.93 8.93 0 0 0 3 12a9 9 0 0 0 18 0c0-2.74-1.23-5.18-3.17-6.83z"/></svg>Al iniciar</a>
       <a href="#about"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Información de Phast</a>
     </nav>
@@ -55,6 +56,34 @@
         </div>
       </section>
 
+      <section id="bookmarks">
+        <h2>Marcadores e importar</h2>
+        <div class="card">
+          <div class="row">
+            <div class="label">Mostrar barra de marcadores<small>Atajo: Ctrl+Mayús+B</small></div>
+            <label class="toggle"><input type="checkbox" data-setting="showBookmarksBar"><span></span></label>
+          </div>
+          <div class="row">
+            <div class="label">Importar marcadores de otro navegador
+              <small>Copia tus marcadores (y sus iconos) de Chrome, Edge o Brave. No se borra nada del otro navegador.</small></div>
+            <select id="importSource"><option value="">Buscando navegadores...</option></select>
+            <button class="btn" id="importBtn">Importar</button>
+          </div>
+          <div class="row">
+            <div class="label">Importar desde un archivo HTML<small>El archivo que exportan Chrome, Firefox, Edge y otros navegadores</small></div>
+            <button class="btn" id="importHtmlBtn">Elegir archivo</button>
+          </div>
+          <div class="row">
+            <div class="label">Exportar marcadores a un archivo HTML</div>
+            <button class="btn" id="exportHtmlBtn">Exportar</button>
+          </div>
+          <div class="row">
+            <div class="label">Gestor de marcadores<small>Atajo: Ctrl+Mayús+O</small></div>
+            <button class="btn" id="managerBtn">Abrir</button>
+          </div>
+        </div>
+      </section>
+
       <section id="startup">
         <h2>Al iniciar</h2>
         <div class="card">
@@ -79,6 +108,7 @@
       </section>
 
       <div class="no-results" id="noResults">No se han encontrado resultados</div>
+      <div class="toast" id="toast"></div>
     </main>
   </div>
 

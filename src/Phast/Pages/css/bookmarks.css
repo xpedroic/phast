@@ -1,0 +1,83 @@
+/* phast://bookmarks — modeled on Chrome's bookmark manager. */
+:root { --card: #ffffff; --page: #f8fafd; --row-hover: #f1f3f4; --sel: #d3e3fd; }
+@media (prefers-color-scheme: dark) { :root { --card: #2b2c2f; --page: #202124; --row-hover: #35363a; --sel: #394457; } }
+
+body { background: var(--page); }
+
+/* Favicons / folder icons everywhere on the page */
+.fav { width: 16px; height: 16px; flex: none; color: var(--text-2); }
+svg.fav { fill: currentColor; }
+
+header {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; align-items: center; gap: 16px; height: 56px; padding: 0 16px 0 24px;
+  background: var(--page); border-bottom: 1px solid var(--border);
+}
+header img { width: 24px; height: 24px; }
+header h1 { font-size: 22px; font-weight: 400; margin: 0; min-width: 200px; }
+.search { flex: 0 1 680px; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--surface); }
+.search input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; }
+.search svg, .icon-btn svg { fill: var(--text-2); flex: none; }
+.spacer { flex: 1; }
+
+.icon-btn { width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; }
+.icon-btn:hover { background: var(--surface); }
+
+.layout { display: flex; }
+aside { width: 256px; flex: none; padding: 8px 0; position: sticky; top: 56px; align-self: flex-start; max-height: calc(100vh - 56px); overflow: auto; }
+.tree-item { display: flex; align-items: center; gap: 8px; height: 36px; padding-right: 16px; margin-right: 8px; border-radius: 0 18px 18px 0; cursor: pointer; white-space: nowrap; }
+.tree-item:hover { background: var(--surface); }
+.tree-item.selected { background: var(--sel); font-weight: 600; }
+.tree-item.drop { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tree-item .twisty { width: 20px; text-align: center; color: var(--text-2); font-size: 10px; flex: none; }
+.tree-item .name { overflow: hidden; text-overflow: ellipsis; }
+
+main { flex: 1; min-width: 0; padding: 16px 24px 80px; max-width: 960px; }
+.card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.12); overflow: hidden; }
+.row {
+  display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 8px 0 20px;
+  color: var(--text); text-decoration: none; border-top: 1px solid transparent; border-bottom: 1px solid transparent;
+}
+.row + .row { border-top-color: var(--border); }
+.row:hover { background: var(--row-hover); }
+.row.drop-before { border-top: 2px solid var(--accent); }
+.row.drop-after { border-bottom: 2px solid var(--accent); }
+.row.drop-into { background: var(--sel); }
+.row .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
+.row .url { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; font-size: 13px; }
+.row .icon-btn { width: 32px; height: 32px; opacity: 0; }
+.row:hover .icon-btn, .row .icon-btn:focus { opacity: 1; }
+
+.empty { padding: 48px; text-align: center; color: var(--text-2); }
+.path { color: var(--text-2); margin: 0 0 12px 4px; font-size: 13px; }
+
+/* Popup menu */
+.menu {
+  position: fixed; z-index: 10; min-width: 220px; padding: 6px 0; border-radius: 8px;
+  background: var(--card); box-shadow: 0 4px 16px rgba(0,0,0,.28); display: none;
+}
+.menu.open { display: block; }
+.menu button { display: block; width: 100%; text-align: left; height: 34px; padding: 0 16px; border: 0; background: transparent; color: var(--text); font: inherit; cursor: pointer; white-space: nowrap; }
+.menu button:hover { background: var(--row-hover); }
+.menu hr { border: 0; border-top: 1px solid var(--border); margin: 6px 0; }
+.menu .label { padding: 6px 16px; color: var(--text-2); font-size: 12px; }
+
+/* Edit dialog */
+dialog { border: 0; border-radius: 12px; padding: 24px; width: 420px; background: var(--card); color: var(--text); box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog h2 { margin: 0 0 16px; font-size: 18px; font-weight: 400; }
+dialog label { display: block; font-size: 12px; color: var(--text-2); margin: 12px 0 4px; }
+dialog input { width: 100%; height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; outline: 0; }
+dialog input:focus { border: 2px solid var(--accent); padding: 0 9px; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.btn { height: 36px; padding: 0 18px; border-radius: 18px; border: 1px solid var(--border); background: transparent; color: var(--accent); font: inherit; cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+.toast {
+  position: fixed; left: 24px; bottom: 24px; z-index: 20; padding: 14px 20px; border-radius: 8px;
+  background: #323232; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px);
+  transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: none; }
+
+@media (max-width: 760px) { aside { display: none; } }

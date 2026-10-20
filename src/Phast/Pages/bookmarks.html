@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Marcadores</title>
+  <link rel="icon" href="img/phast.png">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/bookmarks.css">
+</head>
+<body>
+  <header>
+    <img src="img/phast.png" alt="">
+    <h1>Marcadores</h1>
+    <label class="search">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input id="search" type="search" placeholder="Buscar marcadores">
+    </label>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="mainMenuBtn" title="Más acciones">
+      <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+    </button>
+  </header>
+
+  <div class="layout">
+    <aside id="tree"></aside>
+    <main>
+      <div class="path" id="path"></div>
+      <div class="card" id="list"></div>
+    </main>
+  </div>
+
+  <div class="menu" id="menu"></div>
+
+  <dialog id="dialog">
+    <h2 id="dlgTitle"></h2>
+    <form method="dialog" id="dlgForm">
+      <label for="dlgName">Nombre</label>
+      <input id="dlgName" autocomplete="off">
+      <div id="dlgUrlBox">
+        <label for="dlgUrl">URL</label>
+        <input id="dlgUrl" autocomplete="off">
+      </div>
+      <div class="actions">
+        <button class="btn" value="cancel" type="button" id="dlgCancel">Cancelar</button>
+        <button class="btn primary" value="ok" type="submit">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/phast.js"></script>
+  <script src="js/bookmarks.js"></script>
+</body>
+</html>

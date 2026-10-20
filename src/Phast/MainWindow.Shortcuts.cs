@@ -61,6 +61,11 @@ public partial class MainWindow
             case Commands.FullScreen: SetFullScreen(!_isFullScreen); return true;
             case Commands.Print: tab?.Core?.ShowPrintUI(); return true;
             case Commands.Settings: OpenInternalPage("phast://settings"); return true;
+            case Commands.Bookmark: BookmarkCurrentPage(); return true;
+            case Commands.ToggleBookmarksBar:
+                Settings.SettingsService.Update(s => s.ShowBookmarksBar = !s.ShowBookmarksBar);
+                return true;
+            case Commands.BookmarkManager: OpenInternalPage("phast://bookmarks"); return true;
             case Commands.Home:tab?.Navigate(Core.InternalPages.ToRealUrl(Core.InternalPages.NewTab)); return true;
         }
 

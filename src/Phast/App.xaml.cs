@@ -41,6 +41,14 @@ public partial class App : Application
         ThemeManager.Initialize();
         InternalPages.EnsureExtracted();
         Bridge.PageBridge.Initialize();
+        Omnibox.SuggestionProvider.BookmarkSource = text => Bookmarks.BookmarkStore.Search(text).Take(3).Select(b => new Omnibox.Suggestion
+        {
+            Kind = Omnibox.SuggestionKind.Bookmark,
+            Text = b.Title.Length > 0 ? b.Title : b.Url!,
+            Detail = Omnibox.SuggestionProvider.Strip(b.Url!).TrimEnd('/'),
+            Target = b.Url!,
+            FillText = b.Url!,
+        });
 
         SingleInstance.ArgumentsReceived += args =>
             Dispatcher.BeginInvoke(() => SessionManager.HandleExternalLaunch(ParseUrls(args)));
@@ -51,6 +59,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         History.HistoryStore.Close();
+        Bookmarks.BookmarkStore.SaveNow();
         base.OnExit(e);
     }
 

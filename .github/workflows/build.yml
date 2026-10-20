@@ -30,6 +30,10 @@ jobs:
           $has = Test-Path "src/Phast/Phast.csproj"
           "has_project=$($has.ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
+      - name: Unit tests
+        if: steps.check.outputs.has_project == 'true'
+        run: dotnet test tests/Phast.Tests/Phast.Tests.csproj -c Release
+
       - name: Build (build.bat -> dist/)
         if: steps.check.outputs.has_project == 'true'
         shell: cmd

@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5596672B-433
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phast", "src\Phast\Phast.csproj", "{424626AB-98A4-4966-BD34-D4CE108F6106}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A656170C-DC86-4928-9EBB-11A08F3C31F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phast.Tests", "tests\Phast.Tests\Phast.Tests.csproj", "{7DE43CEC-26D2-448B-B273-000B7A6D0AD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{424626AB-98A4-4966-BD34-D4CE108F6106}.Debug|Any CPU.Build.0 = Debug|x64
 		{424626AB-98A4-4966-BD34-D4CE108F6106}.Release|Any CPU.ActiveCfg = Release|x64
 		{424626AB-98A4-4966-BD34-D4CE108F6106}.Release|Any CPU.Build.0 = Release|x64
+		{7DE43CEC-26D2-448B-B273-000B7A6D0AD5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{7DE43CEC-26D2-448B-B273-000B7A6D0AD5}.Debug|Any CPU.Build.0 = Debug|x64
+		{7DE43CEC-26D2-448B-B273-000B7A6D0AD5}.Release|Any CPU.ActiveCfg = Release|x64
+		{7DE43CEC-26D2-448B-B273-000B7A6D0AD5}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{424626AB-98A4-4966-BD34-D4CE108F6106} = {5596672B-433C-4116-89D3-D256F813456B}
+		{7DE43CEC-26D2-448B-B273-000B7A6D0AD5} = {A656170C-DC86-4928-9EBB-11A08F3C31F2}
 	EndGlobalSection
 EndGlobal

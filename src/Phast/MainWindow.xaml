@@ -113,6 +113,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -187,7 +188,7 @@
                         <Button x:Name="SiteInfoButton" DockPanel.Dock="Left" Style="{StaticResource OmniboxButton}"
                                 Content="&#xE721;" ToolTip="Información del sitio"/>
                         <Button x:Name="StarButton" DockPanel.Dock="Right" Style="{StaticResource OmniboxButton}"
-                                Content="&#xE734;" ToolTip="Añadir a marcadores (Ctrl+D)"/>
+                                Content="&#xE734;" ToolTip="Añadir a marcadores (Ctrl+D)" Click="Star_Click"/>
                         <TextBox x:Name="AddressBox" Style="{StaticResource OmniboxTextBox}" Margin="4,0"
                                  KeyDown="AddressBox_KeyDown" GotKeyboardFocus="AddressBox_GotKeyboardFocus"
                                  LostKeyboardFocus="AddressBox_LostKeyboardFocus"
@@ -198,7 +199,15 @@
         </Border>
 
         <!-- ===== Web content: one WebView2 per loaded tab, stacked; only the active one is visible ===== -->
-        <Grid x:Name="WebHost" Grid.Row="2" Background="{DynamicResource ContentBackgroundBrush}"/>
+        <Grid x:Name="WebHost" Grid.Row="3" Background="{DynamicResource ContentBackgroundBrush}"/>
+
+        <!-- ===== Bookmarks bar ===== -->
+        <controls:BookmarksBar x:Name="BookmarksBar" Grid.Row="2"/>
+
+        <!-- ===== "Bookmark added" / edit bubble ===== -->
+        <Popup x:Name="BubblePopup" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+            <controls:BookmarkBubble x:Name="Bubble"/>
+        </Popup>
 
         <!-- ===== Address bar suggestions dropdown (a Popup, so it floats above the web page) ===== -->
         <Popup x:Name="SuggestPopup" PlacementTarget="{Binding ElementName=Omnibox}" Placement="Bottom"

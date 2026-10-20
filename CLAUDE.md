@@ -12,12 +12,14 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - [x] Fase 1: base (ventana tipo Chrome, pestañas, navegación, barra de direcciones)
 - [ ] Funciones v1 (1–11)
   - [x] 1 Pestañas (hecho en la Fase 1)
+  - [x] 3 Marcadores: barra (carpetas, », clic derecho), estrella/Ctrl+D con burbuja, gestor phast://bookmarks (Ctrl+Mayús+O, arrastrar), importar de Chrome/Edge/Brave/Vivaldi (todos los perfiles + iconos) y HTML, exportar HTML. Pruebas automáticas en tests/Phast.Tests (se ejecutan en CI).
   - [x] 2 Barra de direcciones con sugerencias (historial SQLite, autocompletado, sugerencias del buscador) + buscador configurable en phast://settings (primera versión de ajustes: Apariencia, Buscador, Al iniciar)
 
 ## Notas para pruebas (Claude)
 
 - Arrancar en modo pruebas: variables `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9222` (permite ejecutar JS en las páginas vía DevTools) y `PHAST_LOG=1` (escribe %LOCALAPPDATA%\Phast\debug.log).
 - Al enviar teclas con SendKeys, comprobar SIEMPRE antes que la ventana de Phast está en primer plano; si no, abortar (una vez se escribió en otra ventana del usuario).
+- Para probar sin molestar al usuario: manejar las páginas por DevTools (CDP) y los botones WPF por UI Automation (InvokePattern por x:Name); capturar con PrintWindow (no necesita primer plano). Los Popup con transparencia (burbujas, desplegables) solo salen con captura de pantalla y con Phast delante.
 - No editar archivos de texto con `Get-Content | Set-Content` de Windows PowerShell 5.1: rompe las tildes (UTF-8). Usar las herramientas de edición.
 - [ ] Medición de rendimiento frente a Chrome
 - [ ] Al terminar todo: subir a GitHub (README) capturas del navegador y pruebas de rendimiento: tiempos de apertura, RAM y CPU de Phast frente a otros navegadores instalados (Chrome, Edge, Brave...), mismas páginas, para demostrar que consume menos.

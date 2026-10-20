@@ -22,6 +22,9 @@ public static class Commands
     public const string Print = "print";
     public const string Home = "home";
     public const string Settings = "settings";
+    public const string Bookmark = "bookmark";
+    public const string ToggleBookmarksBar = "toggleBookmarksBar";
+    public const string BookmarkManager = "bookmarkManager";
     /// <summary>"tab1".."tab8": jump to the n-th tab.</summary>
     public static string GoToTab(int n) => "tab" + n;
 }
@@ -88,6 +91,9 @@ public sealed class ShortcutMap
         m.Bind(Commands.FullScreen, Key.F11, ModifierKeys.None);
         m.Bind(Commands.Print, Key.P, C);
         m.Bind(Commands.Home, Key.Home, A);
+        m.Bind(Commands.Bookmark, Key.D, C);
+        m.Bind(Commands.ToggleBookmarksBar, Key.B, C | S);
+        m.Bind(Commands.BookmarkManager, Key.O, C | S);
         return m;
     }
 

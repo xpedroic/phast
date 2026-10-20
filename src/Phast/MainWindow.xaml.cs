@@ -43,6 +43,7 @@ public partial class MainWindow : Window
         MouseDown += OnMouseDown;
         Activated += (_, _) => SessionManager.LastActiveWindow = this;
         InitTabDrag();
+        InitBookmarks();
 
         _omnibox = new Omnibox.OmniboxController(AddressBox, SuggestPopup, SuggestList, NavigateFromOmnibox);
         AddressBox.PreviewTextInput += (_, _) => _lastAddressTyping = DateTime.Now;
@@ -207,9 +208,13 @@ public partial class MainWindow : Window
     {
         var url = Tabs.Active?.Url;
         UpdateSiteIcon(url);
-        if (AddressBox.IsKeyboardFocusWithin && !force) return; // don't overwrite what the user is typing
+        UpdateStar();
+        // Never overwrite what the user is typing (Chrome does the same); untouched text follows the page.
+        if (_omnibox.UserEdited && !force) return;
         _addressLostToOtherWindow = false;
-        _omnibox.SetText(AddressBox.IsKeyboardFocusWithin ? UrlResolver.ToDisplay(url) : ShortDisplay(url));
+        var focused = AddressBox.IsKeyboardFocusWithin;
+        _omnibox.SetText(focused ? UrlResolver.ToDisplay(url) : ShortDisplay(url));
+        if (focused) AddressBox.SelectAll();
     }
 
     /// <summary>Chrome hides "https://" and "www." while the address bar is not focused.</summary>

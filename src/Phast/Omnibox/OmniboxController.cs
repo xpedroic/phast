@@ -48,6 +48,9 @@ public sealed class OmniboxController
 
     public bool IsOpen => _popup.IsOpen;
 
+    /// <summary>The user changed the text since it was last set by the browser.</summary>
+    public bool UserEdited { get; private set; }
+
     /// <summary>Changes the address bar text from code without triggering suggestions.</summary>
     public void SetText(string text)
     {
@@ -56,6 +59,7 @@ public sealed class OmniboxController
         _box.Text = text;
         _suppress = false;
         _userText = _completion = text;
+        UserEdited = false;
     }
 
     // ------------------------------------------------------------ typing
@@ -63,6 +67,7 @@ public sealed class OmniboxController
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
         if (_suppress || !_box.IsKeyboardFocusWithin) return;
+        UserEdited = true;
         _userText = _box.Text;
         _completion = _userText;
         _ = UpdateAsync();

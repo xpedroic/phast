@@ -59,5 +59,38 @@
     document.getElementById("noResults").style.display = any ? "none" : "block";
   });
 
+  // ---- bookmarks: import / export
+  let toastTimer;
+  function toast(text) {
+    const t = document.getElementById("toast");
+    t.textContent = text;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 4000);
+  }
+
+  const importSelect = document.getElementById("importSource");
+  const importBtn = document.getElementById("importBtn");
+  phast.on("bookmarkSources", (msg) => {
+    importSelect.innerHTML = "";
+    for (const s of msg.sources) importSelect.add(new Option(s.label, s.id));
+    if (msg.sources.length === 0) importSelect.add(new Option("No se ha encontrado ningún navegador", ""));
+    importBtn.disabled = msg.sources.length === 0;
+  });
+  importBtn.addEventListener("click", () => {
+    if (!importSelect.value) return;
+    importBtn.disabled = true;
+    phast.send("bookmarks.importBrowser", { id: importSelect.value });
+  });
+  phast.on("bookmarksImported", (msg) => {
+    importBtn.disabled = false;
+    toast(msg.count > 0 ? `Se han importado ${msg.count} marcadores ${msg.detail}` : msg.detail || "No se ha importado nada");
+  });
+  phast.on("bookmarksExported", (msg) => toast(`Se han exportado ${msg.count} marcadores`));
+  document.getElementById("importHtmlBtn").addEventListener("click", () => phast.send("bookmarks.importHtml"));
+  document.getElementById("exportHtmlBtn").addEventListener("click", () => phast.send("bookmarks.exportHtml"));
+  document.getElementById("managerBtn").addEventListener("click", () => phast.send("openPage", { url: "phast://bookmarks" }));
+
   phast.send("settings.get");
+  phast.send("bookmarks.sources");
 })();

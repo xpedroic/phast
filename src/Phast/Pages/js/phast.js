@@ -2,7 +2,8 @@
 // Usage: phast.send("navigate", { text: "github.com" });  phast.on("someEvent", data => ...);
 (function () {
   const handlers = {};
-  const webview = window.chrome && window.chrome.webview;
+  // Only talk to the browser when this page is the top-level document (never when embedded in a frame).
+  const webview = window.top === window && window.chrome && window.chrome.webview;
 
   window.phast = {
     available: !!webview,

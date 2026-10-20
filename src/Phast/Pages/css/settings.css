@@ -71,6 +71,20 @@ select {
 .muted { color: var(--text-2); }
 a.link { color: var(--accent); }
 
+.btn {
+  height: 34px; padding: 0 18px; border-radius: 17px; border: 1px solid var(--border);
+  background: transparent; color: var(--accent); font: inherit; cursor: pointer; flex: none;
+}
+.btn:hover { background: var(--surface); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+.toast {
+  position: fixed; left: 24px; bottom: 24px; z-index: 20; padding: 14px 20px; border-radius: 8px;
+  background: #323232; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px);
+  transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: none; }
+
 .no-results { display: none; padding: 40px; text-align: center; color: var(--text-2); }
 
 @media (max-width: 860px) { nav { display: none; } }

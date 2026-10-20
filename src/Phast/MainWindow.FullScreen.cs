@@ -23,6 +23,7 @@ public partial class MainWindow
 
             TitleBar.Visibility = Visibility.Collapsed;
             Toolbar.Visibility = Visibility.Collapsed;
+            BookmarksBar.Visibility = Visibility.Collapsed;
             chrome.CaptionHeight = 0;
             chrome.ResizeBorderThickness = new Thickness(0);
             ResizeMode = ResizeMode.NoResize;
@@ -36,6 +37,7 @@ public partial class MainWindow
             _isFullScreen = false;
             TitleBar.Visibility = Visibility.Visible;
             Toolbar.Visibility = Visibility.Visible;
+            UpdateBookmarksBarVisibility();
             chrome.ResizeBorderThickness = new Thickness(6);
             ResizeMode = ResizeMode.CanResize;
 

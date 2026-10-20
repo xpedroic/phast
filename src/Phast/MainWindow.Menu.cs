@@ -27,6 +27,8 @@ public partial class MainWindow
         reopen.IsEnabled = Tabs.HasClosedTabs;
         menu.Items.Add(reopen);
         menu.Items.Add(new Separator());
+        menu.Items.Add(BuildBookmarksItem());
+        menu.Items.Add(new Separator());
         menu.Items.Add(BuildZoomItem());
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("Imprimir...", "", Commands.Print));
@@ -54,6 +56,21 @@ public partial class MainWindow
     }
 
     private static TextBlock Glyph(string glyph) => new() { Text = glyph };
+
+    /// <summary>"Marcadores" submenu, like Chrome's.</summary>
+    private MenuItem BuildBookmarksItem()
+    {
+        var root = new MenuItem { Header = "Marcadores", Icon = Glyph("") };
+        root.Items.Add(Item("Añadir esta pestaña a marcadores...", "", Commands.Bookmark));
+        var toggle = Item("Mostrar barra de marcadores", "", Commands.ToggleBookmarksBar);
+        toggle.IsChecked = Settings.SettingsService.Current.ShowBookmarksBar;
+        root.Items.Add(toggle);
+        root.Items.Add(Item("Gestor de marcadores", "", Commands.BookmarkManager));
+        var import = new MenuItem { Header = "Importar marcadores y ajustes...", Icon = Glyph("") };
+        import.Click += (_, _) => OpenInternalPage("phast://settings#bookmarks");
+        root.Items.Add(import);
+        return root;
+    }
 
     /// <summary>"Zoom   −  100 %  +" row, which stays open while clicking.</summary>
     private MenuItem BuildZoomItem()

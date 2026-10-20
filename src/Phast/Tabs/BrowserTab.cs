@@ -211,7 +211,9 @@ public sealed class BrowserTab : ObservableObject
             if (stream == null || stream.Length == 0) { Favicon = null; FaviconPng = null; return; }
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
-            SetFaviconFromPng(ms.ToArray());
+            var png = ms.ToArray();
+            SetFaviconFromPng(png);
+            FaviconCache.Save(core.Source, png);
         }
         catch (Exception ex)
         {

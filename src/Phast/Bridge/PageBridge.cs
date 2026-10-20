@@ -18,7 +18,8 @@ public static class PageBridge
     public static void Initialize()
     {
         // Keep every open settings page in sync (e.g. theme changed from another window).
-        SettingsService.Changed += () => Broadcast(SettingsMessage());
+        SettingsService.Changed += () => Broadcast(SettingsMessage(), "settings.html");
+        BookmarksBridge.Initialize();
     }
 
     public static void Handle(BrowserTab tab, string json)
@@ -41,6 +42,17 @@ public static class PageBridge
 
                 case "settings.set":
                     SettingsService.SetValue(root.GetProperty("key").GetString() ?? "", root.GetProperty("value"));
+                    break;
+
+                case not null when type.StartsWith("bookmarks.", StringComparison.Ordinal):
+                    BookmarksBridge.Handle(tab, type, root);
+                    break;
+
+                case "openPage":
+                    // Internal pages asking to open another internal page (e.g. settings -> bookmarks manager).
+                    var page = root.GetProperty("url").GetString() ?? "";
+                    if (page.StartsWith(InternalPages.Scheme, StringComparison.Ordinal))
+                        SessionManager.LastActiveWindow?.OpenInternalPage(page);
                     break;
 
                 default:
@@ -68,12 +80,13 @@ public static class PageBridge
         return msg.ToJsonString();
     }
 
-    /// <summary>Sends a message to every loaded internal page in every window.</summary>
-    private static void Broadcast(string json)
+    /// <summary>Sends a message to every loaded internal page (optionally only pages whose file name matches).</summary>
+    public static void Broadcast(string json, string? page = null)
     {
         foreach (var window in SessionManager.Windows)
             foreach (var tab in window.Tabs.Tabs)
-                if (tab.Core != null && InternalPages.IsInternal(tab.Url))
+                if (tab.Core != null && InternalPages.IsInternal(tab.Url)
+                    && (page == null || tab.Url.Contains("/" + page, StringComparison.OrdinalIgnoreCase)))
                     tab.PostMessage(json);
     }
 }
