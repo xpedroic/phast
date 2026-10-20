@@ -32,7 +32,7 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - Al enviar teclas con SendKeys, comprobar SIEMPRE antes que la ventana de Phast está en primer plano; si no, abortar (una vez se escribió en otra ventana del usuario).
 - Para probar sin molestar al usuario: manejar las páginas por DevTools (CDP) y los botones WPF por UI Automation (InvokePattern por x:Name); capturar con PrintWindow (no necesita primer plano). Los Popup con transparencia (burbujas, desplegables) solo salen con captura de pantalla y con Phast delante.
 - No editar archivos de texto con `Get-Content | Set-Content` de Windows PowerShell 5.1: rompe las tildes (UTF-8). Usar las herramientas de edición.
-- [ ] Medición de rendimiento frente a Chrome
+- [x] Medición de rendimiento frente a Chrome y Edge (20/10/2026, tabla en README; repetir con la v1 final). Script: perfiles nuevos, 3 arranques vacíos + 2 con 5 webs, suma de procesos.
 - [ ] Al terminar todo: subir a GitHub (README) capturas del navegador y pruebas de rendimiento: tiempos de apertura, RAM y CPU de Phast frente a otros navegadores instalados (Chrome, Edge, Brave...), mismas páginas, para demostrar que consume menos.
 - [ ] Release v0.1.0 (preguntar antes de publicar)
 

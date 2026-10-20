@@ -32,6 +32,21 @@ Lo que lo hace especial:
 | ![Ajustes con el diseño de Chrome](docs/screenshots/settings.png) | ![Monitor de memoria y CPU por pestaña](docs/screenshots/developer-monitor.png) |
 | *Ajustes (phast://settings)* | *Modo desarrollador: monitor de pestañas* |
 
+### Rendimiento
+
+Medido el 20/10/2026 en el mismo PC con Windows 11, cada navegador con un perfil nuevo y sin extensiones (Phast 0.1.0, Chrome 155, Edge 155). Media de 3 arranques en vacío y 2 arranques abriendo las mismas 5 webs (Wikipedia, GitHub, Marca, YouTube y Reddit), midiendo 25 s después. Memoria y CPU = suma de todos los procesos de cada navegador.
+
+| | Phast | Chrome | Edge |
+|---|---|---|---|
+| **Arranque en vacío**: ventana visible | 1,0 s | **0,6 s** | 1,1 s |
+| **Arranque en vacío**: memoria privada | **203 MB** | 310 MB | 409 MB |
+| **Arranque en vacío**: CPU usada | **6 s** | 11 s | 20 s |
+| **5 webs**: memoria privada | **~900 MB** | ~1.000 MB | ~900 MB |
+| **5 webs**: memoria en uso (working set) | **1.420 MB** | 1.670 MB | 1.490 MB |
+| **5 webs**: CPU usada | **47 s** | 56 s | 54 s |
+
+En resumen: Phast arranca usando **un 35 % menos de memoria y casi la mitad de CPU que Chrome**, y con páginas abiertas gasta menos que Chrome gracias al bloqueador de anuncios integrado. Chrome sigue mostrando su ventana algo antes (unos 0,4 s). Además, Phast duerme las pestañas que no usas, así que con el tiempo la diferencia crece.
+
 ### Descargar
 
 1. Ve a la página de [Releases](https://github.com/xpedroic/phast/releases).
@@ -94,6 +109,21 @@ Highlights:
 | *Built-in ad blocker, dark theme* | *Instant dark mode (Ctrl+Shift+D)* |
 | ![Chrome-style settings](docs/screenshots/settings.png) | ![Per-tab memory and CPU monitor](docs/screenshots/developer-monitor.png) |
 | *Settings (phast://settings)* | *Developer mode: tab monitor* |
+
+### Performance
+
+Measured on 2026-10-20 on the same Windows 11 PC, every browser with a fresh profile and no extensions (Phast 0.1.0, Chrome 155, Edge 155). Average of 3 empty starts and 2 starts opening the same 5 sites (Wikipedia, GitHub, Marca, YouTube and Reddit), measured after 25 s. Memory and CPU = sum of all the browser's processes.
+
+| | Phast | Chrome | Edge |
+|---|---|---|---|
+| **Empty start**: window visible | 1.0 s | **0.6 s** | 1.1 s |
+| **Empty start**: private memory | **203 MB** | 310 MB | 409 MB |
+| **Empty start**: CPU used | **6 s** | 11 s | 20 s |
+| **5 sites**: private memory | **~900 MB** | ~1,000 MB | ~900 MB |
+| **5 sites**: memory in use (working set) | **1,420 MB** | 1,670 MB | 1,490 MB |
+| **5 sites**: CPU used | **47 s** | 56 s | 54 s |
+
+In short: Phast starts with **35% less memory and about half the CPU of Chrome**, and with pages open it uses less than Chrome thanks to the built-in ad blocker. Chrome still shows its window slightly sooner (~0.4 s). Phast also puts unused tabs to sleep, so the gap grows over time.
 
 ### Download
 
