@@ -89,6 +89,7 @@ public partial class MainWindow
         Button Btn(string text, int direction)
         {
             var b = new Button { Content = text, Style = (Style)FindResource("MenuInlineButton") };
+            System.Windows.Automation.AutomationProperties.SetAutomationId(b, direction > 0 ? "ZoomInButton" : "ZoomOutButton");
             b.Click += (_, _) => { StepZoom(direction); Refresh(); };
             return b;
         }
@@ -114,5 +115,6 @@ public partial class MainWindow
             ? ZoomLevels.FirstOrDefault(z => z > current + 0.001, ZoomLevels[^1])
             : ZoomLevels.LastOrDefault(z => z < current - 0.001, ZoomLevels[0]);
         wv.ZoomFactor = next;
+        Tabs.Active?.OnZoomChanged(); // programmatic zoom isn't reported by the engine
     }
 }

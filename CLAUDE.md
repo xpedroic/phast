@@ -25,6 +25,9 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
   - [x] 3 Marcadores: barra (carpetas, », clic derecho), estrella/Ctrl+D con burbuja, gestor phast://bookmarks (Ctrl+Mayús+O, arrastrar), importar de Chrome/Edge/Brave/Vivaldi (todos los perfiles + iconos) y HTML, exportar HTML. Pruebas automáticas en tests/Phast.Tests (se ejecutan en CI).
   - [x] 2 Barra de direcciones con sugerencias (historial SQLite, autocompletado, sugerencias del buscador) + buscador configurable en phast://settings (primera versión de ajustes: Apariencia, Buscador, Al iniciar)
 
+- [x] Extras antes de la Release (pedidos por el usuario): guardar contraseñas y autocompletar (Privacidad), navegador predeterminado (Core/DefaultBrowser.cs, HKCU, abre Ajustes de Windows), red de seguridad (Core/CrashGuard.cs: informes en %LOCALAPPDATA%\Phast\crashes, recarga páginas caídas, reinicia si muere el motor), aviso de versión nueva (Core/UpdateChecker.cs, botón "Actualizar"), zoom recordado por web (Core/ZoomMemory.cs + lupa en la barra). Sin probar por mí: botón de navegador predeterminado (abre Ajustes de Windows).
+- Pendiente: el usuario lo prueba en el día a día; luego comparativa final y Release v0.1.0 (preguntar antes).
+
 ## Notas para pruebas (Claude)
 
 - Arrancar en modo pruebas: variables `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9222` (permite ejecutar JS en las páginas vía DevTools) y `PHAST_LOG=1` (escribe %LOCALAPPDATA%\Phast\debug.log).

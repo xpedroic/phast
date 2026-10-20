@@ -119,13 +119,16 @@ public sealed partial class BrowserTab : ObservableObject
         core.Settings.IsStatusBarEnabled = true;
         core.Settings.AreDevToolsEnabled = true;
         core.Profile.PreferredColorScheme = Themes.ThemeManager.PreferredScheme;
+        ApplyFormSettings();
+        core.ProcessFailed += OnProcessFailed;
+        webView.ZoomFactorChanged += (_, _) => OnZoomChanged();
 
         core.DocumentTitleChanged += (_, _) =>
         {
             Title = core.DocumentTitle;
             HistoryStore.UpdateTitleAsync(core.Source, core.DocumentTitle).Forget();
         };
-        core.SourceChanged += (_, _) => Url = core.Source;
+        core.SourceChanged += (_, _) => { Url = core.Source; ApplySiteZoom(); };
         core.HistoryChanged += (_, _) => { CanGoBack = core.CanGoBack; CanGoForward = core.CanGoForward; };
         core.NavigationStarting += (_, _) => IsLoading = true;
         core.NavigationCompleted += (_, e) =>

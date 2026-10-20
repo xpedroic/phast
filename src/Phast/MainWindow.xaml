@@ -209,6 +209,18 @@
 
                 <!-- Extension / action icons will live here. -->
                 <StackPanel x:Name="ActionsBar" DockPanel.Dock="Right" Orientation="Horizontal">
+                    <!-- New Phast version available (Chrome-like "Update" pill) -->
+                    <Button x:Name="UpdateButton" Visibility="Collapsed" Click="Update_Click" Focusable="False" Margin="2,0,4,0"
+                            Cursor="Hand" ToolTip="Hay una versión nueva de Phast">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{DynamicResource AccentBrush}" CornerRadius="14" Height="28" Padding="12,0">
+                                    <TextBlock Text="Actualizar" Foreground="{DynamicResource ContentBackgroundBrush}" FontSize="12"
+                                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
                     <!-- Downloads: only visible once something was downloaded in this run; ring = progress -->
                     <Button x:Name="DownloadsButton" Style="{StaticResource ToolbarButton}" Click="Downloads_Click"
                             ToolTip="Descargas (Ctrl+J)" Visibility="Collapsed">
@@ -263,6 +275,8 @@
                     <DockPanel Margin="4,0">
                         <Button x:Name="SiteInfoButton" DockPanel.Dock="Left" Style="{StaticResource OmniboxButton}"
                                 Content="&#xE721;" ToolTip="Información del sitio"/>
+                        <Button x:Name="ZoomButton" DockPanel.Dock="Right" Style="{StaticResource OmniboxButton}"
+                                Content="&#xE71E;" Visibility="Collapsed" Click="Zoom_Click"/>
                         <Button x:Name="StarButton" DockPanel.Dock="Right" Style="{StaticResource OmniboxButton}"
                                 Content="&#xE734;" ToolTip="Añadir a marcadores (Ctrl+D)" Click="Star_Click"/>
                         <TextBox x:Name="AddressBox" Style="{StaticResource OmniboxTextBox}" Margin="4,0"

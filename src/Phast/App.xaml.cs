@@ -18,6 +18,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        CrashGuard.Install(this);
 
         // Restarting (to apply engine flags): wait until the previous Phast and its engine have closed.
         var restartArg = e.Args.FirstOrDefault(a => a.StartsWith(AppRestart.Argument, StringComparison.Ordinal));
@@ -65,6 +66,9 @@ public partial class App : Application
         SessionManager.Start(ParseUrls(e.Args));
         Log.Write($"Startup: window shown at {Log.SinceStart:F0} ms");
         Tabs.TabSleeper.Start();
+        UpdateChecker.Start(Dispatcher);
+        Dispatcher.BeginInvoke(() => { if (DefaultBrowser.IsRegistered()) DefaultBrowser.RefreshIfMoved(); },
+            System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }
 
     protected override void OnExit(ExitEventArgs e)

@@ -20,6 +20,7 @@ public partial class MainWindow
         foreach (var tab in Tabs.Tabs)
         {
             tab.EnsureRequestFilter();
+            tab.ApplyFormSettings();
             tab.RefreshSiteScripts();
             tab.RefreshCosmeticScriptAsync().Forget();
         }

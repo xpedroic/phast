@@ -85,6 +85,23 @@ public static class PageBridge
                     break;
                 }
 
+                case "default.status":
+                    tab.PostMessage(new JsonObject { ["type"] = "defaultStatus", ["isDefault"] = DefaultBrowser.IsDefault() }.ToJsonString());
+                    break;
+                case "default.set":
+                    DefaultBrowser.Register();
+                    DefaultBrowser.OpenWindowsSettings();
+                    break;
+                case "updates.check":
+                    var dispatcher = System.Windows.Application.Current.Dispatcher;
+                    _ = UpdateChecker.CheckAsync(dispatcher).ContinueWith(t => dispatcher.BeginInvoke(() => tab.PostMessage(new JsonObject
+                    {
+                        ["type"] = "updateStatus",
+                        ["text"] = t.Result is { } v ? $"Hay una versión nueva: {v}. Pulsa \"Actualizar\" en la barra de herramientas."
+                                                     : $"Tienes la última versión ({UpdateChecker.Current.ToString(3)}).",
+                    }.ToJsonString())));
+                    break;
+
                 case "dark.remove":
                     var site = root.GetProperty("site").GetString() ?? "";
                     SettingsService.Update(s => { s.DarkSites.Remove(site); s.DarkExcludedSites.Remove(site); });

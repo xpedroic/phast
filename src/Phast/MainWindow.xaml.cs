@@ -48,6 +48,7 @@ public partial class MainWindow : Window
         InitAdblockUi();
         InitDarkModeUi();
         InitDownloadsUi();
+        InitExtrasUi();
 
         _omnibox = new Omnibox.OmniboxController(AddressBox, SuggestPopup, SuggestList, NavigateFromOmnibox);
         AddressBox.PreviewTextInput += (_, _) => _lastAddressTyping = DateTime.Now;
@@ -155,9 +156,10 @@ public partial class MainWindow : Window
 
     private void OnActiveTabChanged()
     {
-        if (_observedTab != null) _observedTab.PropertyChanged -= OnActiveTabPropertyChanged;
+        if (_observedTab != null) { _observedTab.PropertyChanged -= OnActiveTabPropertyChanged; _observedTab.ZoomChanged -= OnActiveZoomChanged; }
         _observedTab = Tabs.Active;
-        if (_observedTab != null) _observedTab.PropertyChanged += OnActiveTabPropertyChanged;
+        if (_observedTab != null) { _observedTab.PropertyChanged += OnActiveTabPropertyChanged; _observedTab.ZoomChanged += OnActiveZoomChanged; }
+        UpdateZoomButton();
 
         UpdateNavigationButtons();
         UpdateAddressBar(force: true);

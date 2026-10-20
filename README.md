@@ -55,6 +55,10 @@ En resumen: Phast arranca usando **un 35 % menos de memoria y casi la mitad de C
 
 Necesitas el **WebView2 Runtime**, que ya viene incluido en Windows 11 (y en casi todos los Windows 10 actualizados).
 
+> **Aviso de Windows ("Windows protegió su PC")**: Phast es gratuito y no está firmado con un certificado de pago, así que Windows SmartScreen puede avisarte la primera vez. Pulsa **"Más información" → "Ejecutar de todas formas"**. El código completo está en este repositorio y GitHub compila cada versión automáticamente.
+
+Para que los enlaces de otras aplicaciones se abran en Phast: **Configuración → Navegador predeterminado → Establecer como predeterminado**.
+
 ### Compilar desde el código
 
 Requisitos: Windows 10/11 y el [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
@@ -132,6 +136,10 @@ In short: Phast starts with **35% less memory and about half the CPU of Chrome**
 3. Unzip it anywhere and run `Phast.exe`. No installation needed.
 
 You need the **WebView2 Runtime**, which is already included in Windows 11 (and in almost every up-to-date Windows 10).
+
+> **Windows warning ("Windows protected your PC")**: Phast is free and not signed with a paid certificate, so Windows SmartScreen may warn you the first time. Click **"More info" → "Run anyway"**. The full source code is in this repository and GitHub builds every release automatically.
+
+To open links from other apps in Phast: **Settings → Default browser → Make default**.
 
 ### Build from source
 

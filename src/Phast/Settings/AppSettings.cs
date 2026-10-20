@@ -36,6 +36,16 @@ public sealed class AppSettings
     /// <summary>Ask the search engine for suggestions while typing in the address bar.</summary>
     public bool SearchSuggestions { get; set; } = true;
 
+    // Passwords and forms
+    /// <summary>Offer to save passwords and fill them in (WebView2's built-in password manager).</summary>
+    public bool SavePasswords { get; set; } = true;
+    /// <summary>Remember and suggest form data (names, addresses...).</summary>
+    public bool Autofill { get; set; } = true;
+
+    // Updates
+    /// <summary>Check GitHub once a day for a newer Phast release (only shows a button; nothing is installed).</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
     // Ad blocking
     public bool AdblockEnabled { get; set; } = true;
     /// <summary>Also hide leftover ad boxes on known sites (site-specific element hiding).</summary>

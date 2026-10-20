@@ -228,6 +228,30 @@
   document.getElementById("chooseFolder").addEventListener("click", () => phast.send("downloads.chooseFolder"));
   document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => phast.send("openPage", { url: b.dataset.open })));
 
+  // ---- default browser and updates
+  phast.on("defaultStatus", (m) => {
+    const box = document.getElementById("defaultText");
+    box.innerHTML = m.isDefault
+      ? "Phast es tu navegador predeterminado"
+      : "Navegador predeterminado<small>Haz que los enlaces de otras aplicaciones (correo, WhatsApp, Discord...) se abran en Phast</small>";
+    document.getElementById("makeDefault").style.display = m.isDefault ? "none" : "";
+  });
+  document.getElementById("makeDefault").addEventListener("click", () => {
+    phast.send("default.set");
+    toast("Elige Phast en la ventana de Windows que se abre (navegador web).");
+  });
+  window.addEventListener("focus", () => phast.send("default.status"));
+  phast.on("updateStatus", (m) => {
+    document.getElementById("updateStatus").textContent = m.text;
+    document.getElementById("checkUpdates").disabled = false;
+  });
+  document.getElementById("checkUpdates").addEventListener("click", (e) => {
+    e.target.disabled = true;
+    document.getElementById("updateStatus").textContent = "Buscando...";
+    phast.send("updates.check");
+  });
+
+  phast.send("default.status");
   phast.send("downloads.get");
   phast.send("settings.get");
   phast.send("bookmarks.sources");
