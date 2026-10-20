@@ -1,0 +1,61 @@
+# Builds Phast on every push and, for version tags (v*), publishes a GitHub Release
+# with a ready-to-run Phast.exe packed in a .zip.
+name: build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create releases on tags
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # Skip gracefully until the source project exists.
+      - name: Check for project
+        id: check
+        shell: pwsh
+        run: |
+          $has = Test-Path "src/Phast/Phast.csproj"
+          "has_project=$($has.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
+      - name: Build (build.bat -> dist/)
+        if: steps.check.outputs.has_project == 'true'
+        shell: cmd
+        run: build.bat
+
+      - name: Upload build artifact
+        if: steps.check.outputs.has_project == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Phast-win-x64
+          path: dist/
+
+      - name: Package release zip
+        if: steps.check.outputs.has_project == 'true' && startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $zip = "Phast-${{ github.ref_name }}-win-x64.zip"
+          Compress-Archive -Path dist/* -DestinationPath $zip
+          "ZIP_NAME=$zip" >> $env:GITHUB_ENV
+
+      - name: Publish GitHub Release
+        if: steps.check.outputs.has_project == 'true' && startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" "$env:ZIP_NAME" `
+            --title "Phast ${{ github.ref_name }}" `
+            --generate-notes
