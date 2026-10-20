@@ -165,7 +165,23 @@
                 </Button>
 
                 <!-- Extension / action icons will live here. -->
-                <StackPanel x:Name="ActionsBar" DockPanel.Dock="Right" Orientation="Horizontal"/>
+                <StackPanel x:Name="ActionsBar" DockPanel.Dock="Right" Orientation="Horizontal">
+                    <!-- Ad blocker: shield with the number of blocked requests on this page -->
+                    <Button x:Name="ShieldButton" Style="{StaticResource ToolbarButton}" Click="Shield_Click"
+                            ToolTip="Bloqueador de anuncios">
+                        <Grid Width="34" Height="34">
+                            <TextBlock x:Name="ShieldGlyph" Text="&#xEA18;" FontSize="15"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border x:Name="ShieldBadge" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    Margin="0,0,1,5" MinWidth="15" Height="14" CornerRadius="7" Padding="3,0"
+                                    Background="{DynamicResource AccentBrush}" Visibility="Collapsed">
+                                <TextBlock x:Name="ShieldCount" FontFamily="{StaticResource UiFont}" FontSize="9" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource ContentBackgroundBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Button>
+                </StackPanel>
 
                 <!-- Address bar ("omnibox") -->
                 <Border x:Name="Omnibox" Height="36" CornerRadius="18" Margin="6,0" BorderThickness="2">
@@ -207,6 +223,11 @@
         <!-- ===== "Bookmark added" / edit bubble ===== -->
         <Popup x:Name="BubblePopup" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
             <controls:BookmarkBubble x:Name="Bubble"/>
+        </Popup>
+
+        <!-- ===== Ad blocker bubble (shield button) ===== -->
+        <Popup x:Name="AdblockPopup" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+            <controls:AdblockBubble x:Name="AdblockPanel"/>
         </Popup>
 
         <!-- ===== Address bar suggestions dropdown (a Popup, so it floats above the web page) ===== -->

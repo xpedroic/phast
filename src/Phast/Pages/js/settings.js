@@ -91,6 +91,32 @@
   document.getElementById("exportHtmlBtn").addEventListener("click", () => phast.send("bookmarks.exportHtml"));
   document.getElementById("managerBtn").addEventListener("click", () => phast.send("openPage", { url: "phast://bookmarks" }));
 
+  // ---- ad blocking: lists, status, allowlist
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  phast.on("adblockStatus", (msg) => {
+    const summary = document.getElementById("adblockSummary");
+    summary.textContent = msg.updating ? "Descargando listas..."
+      : msg.ready ? `${msg.networkRules.toLocaleString("es")} reglas activas · preparadas en ${msg.buildMs} ms · se actualizan solas cada 4 días`
+      : "Las listas aún no se han descargado";
+
+    document.getElementById("filterLists").innerHTML = msg.lists.map((l) => `
+      <div class="row">
+        <div class="label">${esc(l.name)}<small>${esc(l.description)} · ${l.updated ? "actualizada el " + esc(l.updated) : "sin descargar"}</small></div>
+        <label class="toggle"><input type="checkbox" data-list="${esc(l.id)}" ${l.enabled ? "checked" : ""}><span></span></label>
+      </div>`).join("");
+    document.querySelectorAll("[data-list]").forEach((el) =>
+      el.addEventListener("change", () => phast.send("adblock.setList", { id: el.dataset.list, enabled: el.checked })));
+
+    const allow = document.getElementById("allowlist");
+    allow.innerHTML = msg.allowlist.length === 0
+      ? `<div class="row"><div class="label"><small>Ninguno. Puedes desactivar el bloqueo en una web desde el escudo de la barra de herramientas.</small></div></div>`
+      : msg.allowlist.map((h) => `<div class="row"><div class="label">${esc(h)}</div><button class="btn" data-unallow="${esc(h)}">Volver a bloquear</button></div>`).join("");
+    allow.querySelectorAll("[data-unallow]").forEach((b) =>
+      b.addEventListener("click", () => phast.send("adblock.unallow", { host: b.dataset.unallow })));
+  });
+  document.getElementById("adblockUpdate").addEventListener("click", () => phast.send("adblock.update"));
+
   phast.send("settings.get");
   phast.send("bookmarks.sources");
+  phast.send("adblock.status");
 })();

@@ -44,13 +44,12 @@ The WebView2 Runtime itself is part of Windows and is not redistributed by Phast
 
 ---
 
-## Ad-block filter lists (EasyList, EasyPrivacy)
+## Ad-block filter lists (EasyList, EasyPrivacy, EasyList Spanish, EasyList Cookie List)
 
-- Source: https://easylist.to/
-- License: dual-licensed GPLv3 / Creative Commons Attribution-ShareAlike 3.0 Unported (https://easylist.to/pages/licence.html)
-- Copyright: The EasyList authors (https://easylist.to/)
+- EasyList, EasyPrivacy, EasyList Spanish — https://easylist.to/ — dual-licensed GPLv3 / Creative Commons Attribution-ShareAlike 3.0 Unported (https://easylist.to/pages/licence.html). Copyright: The EasyList authors.
+- EasyList Cookie List (optional, off by default) — https://secure.fanboy.co.nz/fanboy-cookiemonster.txt — Creative Commons Attribution 3.0 (http://creativecommons.org/licenses/by/3.0/). Copyright: Fanboy and the EasyList authors.
 
-These lists are **not bundled** with Phast's source code or binaries: they are downloaded by the user's browser at runtime from their official URLs and used unmodified as data. Users can add or remove filter lists in Settings.
+These lists are **not bundled** with Phast's source code or binaries: they are downloaded by the user's browser at runtime from their official URLs and used unmodified as data. Phast's own filter engine (`src/Phast/Adblock`) is original code that reads the public Adblock Plus filter syntax. Users can enable or disable lists in Settings.
 
 ---
 

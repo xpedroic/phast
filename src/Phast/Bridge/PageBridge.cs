@@ -20,6 +20,7 @@ public static class PageBridge
         // Keep every open settings page in sync (e.g. theme changed from another window).
         SettingsService.Changed += () => Broadcast(SettingsMessage(), "settings.html");
         BookmarksBridge.Initialize();
+        AdblockBridge.Initialize();
     }
 
     public static void Handle(BrowserTab tab, string json)
@@ -46,6 +47,10 @@ public static class PageBridge
 
                 case not null when type.StartsWith("bookmarks.", StringComparison.Ordinal):
                     BookmarksBridge.Handle(tab, type, root);
+                    break;
+
+                case not null when type.StartsWith("adblock.", StringComparison.Ordinal):
+                    AdblockBridge.Handle(tab, type, root);
                     break;
 
                 case "openPage":

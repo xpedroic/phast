@@ -44,6 +44,8 @@ public partial class BookmarksBar : UserControl
     public event Action? ManagerRequested;
     /// <summary>"Add page" / "Add folder" from the bar's context menu (parent folder id, isFolder).</summary>
     public event Action<string, bool>? AddRequested;
+    /// <summary>"Import bookmarks now" link shown on an empty bar.</summary>
+    public event Action? ImportRequested;
     /// <summary>Toggle the bar's visibility from its own context menu.</summary>
     public event Action? HideRequested;
 
@@ -54,6 +56,8 @@ public partial class BookmarksBar : UserControl
         ItemsHost.Children.Clear();
         foreach (var node in BookmarkStore.Data.Bar.Children!)
             ItemsHost.Children.Add(CreateButton(node));
+
+        EmptyHint.Visibility = ItemsHost.Children.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         var other = BookmarkStore.Data.Other;
         OtherArea.Visibility = other.Children!.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -186,6 +190,8 @@ public partial class BookmarksBar : UserControl
             items.Add(item);
         }
     }
+
+    private void Import_Click(object sender, RoutedEventArgs e) => ImportRequested?.Invoke();
 
     private void Other_Click(object sender, RoutedEventArgs e) => ShowFolderMenu(BookmarkStore.Data.Other, OtherButton);
 

@@ -16,6 +16,7 @@ public partial class MainWindow
         BookmarksBar.EditRequested += EditBookmark;
         BookmarksBar.AddRequested += AddFromBar;
         BookmarksBar.ManagerRequested += () => Execute(Input.Commands.BookmarkManager);
+        BookmarksBar.ImportRequested += () => OpenInternalPage("phast://settings#bookmarks");
         BookmarksBar.HideRequested += () => SettingsService.Update(s => s.ShowBookmarksBar = false);
 
         BookmarkStore.Changed += UpdateStar;

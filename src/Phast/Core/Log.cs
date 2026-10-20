@@ -8,7 +8,7 @@ namespace Phast.Core;
 /// </summary>
 public static class Log
 {
-    private static readonly bool Enabled = Environment.GetEnvironmentVariable("PHAST_LOG") == "1";
+    public static readonly bool Enabled = Environment.GetEnvironmentVariable("PHAST_LOG") == "1";
     private static readonly object Sync = new();
 
     public static void Write(string message)

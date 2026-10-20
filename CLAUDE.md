@@ -12,6 +12,8 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - [x] Fase 1: base (ventana tipo Chrome, pestañas, navegación, barra de direcciones)
 - [ ] Funciones v1 (1–11)
   - [x] 1 Pestañas (hecho en la Fase 1)
+  - [ ] 4 Historial y descargas → el usuario pidió dejarla PARA EL FINAL (después de la 11)
+  - [x] 5 Adblock: motor propio (src/Phast/Adblock) con sintaxis ABP; listas EasyList, EasyPrivacy, EasyList Spanish (+ Cookie List opcional) descargadas y actualizadas cada 4 días; ~3 µs por petición en Release; escudo con contador y burbuja para desactivar por sitio; sección Privacidad en ajustes. PENDIENTE: comprobar visualmente la burbuja del escudo (el PC estaba bloqueado).
   - [x] 3 Marcadores: barra (carpetas, », clic derecho), estrella/Ctrl+D con burbuja, gestor phast://bookmarks (Ctrl+Mayús+O, arrastrar), importar de Chrome/Edge/Brave/Vivaldi (todos los perfiles + iconos) y HTML, exportar HTML. Pruebas automáticas en tests/Phast.Tests (se ejecutan en CI).
   - [x] 2 Barra de direcciones con sugerencias (historial SQLite, autocompletado, sugerencias del buscador) + buscador configurable en phast://settings (primera versión de ajustes: Apariencia, Buscador, Al iniciar)
 

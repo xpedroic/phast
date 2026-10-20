@@ -38,6 +38,7 @@ public partial class App : Application
         AppPaths.EnsureCreated();
         SettingsService.Load();
         _ = BrowserEnvironment.GetAsync();   // start the engine now, in parallel with the UI
+        Adblock.AdblockService.Start();      // load filter lists in the background
         ThemeManager.Initialize();
         InternalPages.EnsureExtracted();
         Bridge.PageBridge.Initialize();

@@ -15,7 +15,7 @@ namespace Phast.Tabs;
 /// One browser tab. The WebView2 control is created lazily: a restored or background tab
 /// only keeps its URL, title and favicon until the user actually opens it.
 /// </summary>
-public sealed class BrowserTab : ObservableObject
+public sealed partial class BrowserTab : ObservableObject
 {
     private string _title = "";
     private string _url = "";
@@ -104,6 +104,7 @@ public sealed class BrowserTab : ObservableObject
 
         var env = await BrowserEnvironment.GetAsync();
         await webView.EnsureCoreWebView2Async(env);
+        Log.Write($"WebView ready for {_pendingUrl ?? "(popup)"}");
         if (WebView != webView) return; // tab was closed or discarded while initializing
 
         var core = webView.CoreWebView2;
@@ -133,6 +134,8 @@ public sealed class BrowserTab : ObservableObject
         core.IsDocumentPlayingAudioChanged += (_, _) => IsAudible = core.IsDocumentPlayingAudio;
         core.IsMutedChanged += (_, _) => IsMuted = core.IsMuted;
         core.WebMessageReceived += OnWebMessageReceived;
+
+        InitAdblock(core, env);
 
         core.MemoryUsageTargetLevel = IsActive ? CoreWebView2MemoryUsageTargetLevel.Normal : CoreWebView2MemoryUsageTargetLevel.Low;
 

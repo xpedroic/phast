@@ -14,7 +14,16 @@
                     Click="Chevron_Click" ToolTip="Más marcadores">
                 <TextBlock Text="»" FontSize="16" Margin="0,-3,0,0" Foreground="{DynamicResource IconBrush}"/>
             </Button>
-            <StackPanel x:Name="ItemsHost" Orientation="Horizontal" ClipToBounds="True"/>
+            <Grid>
+                <StackPanel x:Name="ItemsHost" Orientation="Horizontal" ClipToBounds="True"/>
+                <!-- Shown when the bar is empty, like Chrome -->
+                <StackPanel x:Name="EmptyHint" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0" Visibility="Collapsed">
+                    <TextBlock Text="Para acceder rápidamente, añade tus marcadores a esta barra." FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    <Button Content="Importar marcadores ahora..." Style="{StaticResource LinkButton}" FontSize="12"
+                            Margin="8,0,0,0" VerticalAlignment="Center" Click="Import_Click"/>
+                </StackPanel>
+            </Grid>
         </DockPanel>
     </Border>
 </UserControl>
