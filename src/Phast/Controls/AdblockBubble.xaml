@@ -29,7 +29,7 @@
 
             <DockPanel x:Name="SiteRow">
                 <CheckBox x:Name="SiteToggle" DockPanel.Dock="Right" Style="{StaticResource ToggleSwitch}" VerticalAlignment="Center"
-                          Click="SiteToggle_Click"/>
+                          Checked="SiteToggle_Changed" Unchecked="SiteToggle_Changed"/>
                 <StackPanel>
                     <TextBlock Text="Bloquear en este sitio" FontSize="13" Foreground="{DynamicResource TextBrush}"/>
                     <TextBlock Text="Al cambiarlo se recarga la página" FontSize="11" Margin="0,2,0,0"

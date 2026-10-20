@@ -12,6 +12,7 @@ public partial class AdblockBubble : UserControl
 {
     private Popup? _popup;
     private BrowserTab? _tab;
+    private bool _refreshing; // ignore switch changes made by Refresh() itself
 
     public AdblockBubble() => InitializeComponent();
 
@@ -39,7 +40,9 @@ public partial class AdblockBubble : UserControl
         var globallyOn = SettingsService.Current.AdblockEnabled;
         var siteOn = isWeb && AdblockService.IsActiveFor(host);
         SiteRow.Visibility = isWeb && globallyOn ? Visibility.Visible : Visibility.Collapsed;
+        _refreshing = true;
         SiteToggle.IsChecked = siteOn;
+        _refreshing = false;
 
         CountText.Text = _tab.BlockedCount.ToString("N0");
         CountLabel.Text = _tab.BlockedCount == 1 ? "elemento bloqueado en esta página" : "elementos bloqueados en esta página";
@@ -52,9 +55,10 @@ public partial class AdblockBubble : UserControl
         StatusText.Visibility = status != null ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void SiteToggle_Click(object sender, RoutedEventArgs e)
+    // Checked/Unchecked (not Click) so mouse, keyboard and accessibility tools all work.
+    private void SiteToggle_Changed(object sender, RoutedEventArgs e)
     {
-        if (_tab == null || _tab.DocumentHost.Length == 0) return;
+        if (_refreshing || _tab == null || _tab.DocumentHost.Length == 0) return;
         AdblockService.SetAllowed(_tab.DocumentHost, allowed: SiteToggle.IsChecked != true);
         _tab.Core?.Reload();
         Refresh();
