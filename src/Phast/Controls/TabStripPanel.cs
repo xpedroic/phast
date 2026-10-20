@@ -1,37 +1,50 @@
 using System.Windows;
 using System.Windows.Controls;
+using Phast.Tabs;
 
 namespace Phast.Controls;
 
 /// <summary>
 /// Lays tabs out horizontally like Chrome: every tab gets the same width, up to <see cref="MaxTabWidth"/>,
 /// shrinking evenly (down to <see cref="MinTabWidth"/>) as more tabs are opened.
-/// Tabs overlap by <see cref="Overlap"/> so their curved "feet" blend into each other.
+/// Tab group labels take just the width they need; hidden (collapsed) items take none.
 /// </summary>
 public sealed class TabStripPanel : Panel
 {
     public double MaxTabWidth { get; set; } = 240;
     public double MinTabWidth { get; set; } = 44;
-    public double Overlap { get; set; } = 0;
 
-    /// <summary>Width each tab currently gets; used by drag-and-drop to find the drop index.</summary>
+    /// <summary>Width each tab currently gets.</summary>
     public double TabWidth { get; private set; }
+
+    private static bool IsGroupLabel(UIElement child) => (child as FrameworkElement)?.DataContext is TabGroup;
 
     protected override Size MeasureOverride(Size available)
     {
-        var n = InternalChildren.Count;
-        if (n == 0) return new Size(0, 0);
-
-        var width = double.IsInfinity(available.Width) ? MaxTabWidth : (available.Width + Overlap * (n - 1)) / n;
-        TabWidth = Math.Clamp(width, MinTabWidth, MaxTabWidth);
-
-        double height = 0;
+        double labels = 0, height = 0;
+        var tabs = 0;
         foreach (UIElement child in InternalChildren)
         {
+            if (child.Visibility == Visibility.Collapsed) continue;
+            if (IsGroupLabel(child))
+            {
+                child.Measure(new Size(double.PositiveInfinity, available.Height));
+                labels += child.DesiredSize.Width;
+                height = Math.Max(height, child.DesiredSize.Height);
+            }
+            else tabs++;
+        }
+
+        var forTabs = double.IsInfinity(available.Width) ? MaxTabWidth * tabs : Math.Max(0, available.Width - labels);
+        TabWidth = tabs == 0 ? 0 : Math.Clamp(forTabs / tabs, MinTabWidth, MaxTabWidth);
+
+        foreach (UIElement child in InternalChildren)
+        {
+            if (child.Visibility == Visibility.Collapsed || IsGroupLabel(child)) continue;
             child.Measure(new Size(TabWidth, available.Height));
             height = Math.Max(height, child.DesiredSize.Height);
         }
-        return new Size(TabWidth * n - Overlap * (n - 1), height);
+        return new Size(labels + TabWidth * tabs, height);
     }
 
     protected override Size ArrangeOverride(Size final)
@@ -39,8 +52,10 @@ public sealed class TabStripPanel : Panel
         double x = 0;
         foreach (UIElement child in InternalChildren)
         {
-            child.Arrange(new Rect(x, 0, TabWidth, final.Height));
-            x += TabWidth - Overlap;
+            if (child.Visibility == Visibility.Collapsed) { child.Arrange(new Rect(x, 0, 0, 0)); continue; }
+            var width = IsGroupLabel(child) ? child.DesiredSize.Width : TabWidth;
+            child.Arrange(new Rect(x, 0, width, final.Height));
+            x += width;
         }
         return final;
     }

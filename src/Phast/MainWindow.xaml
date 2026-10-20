@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:controls="clr-namespace:Phast.Controls"
+        xmlns:tabs="clr-namespace:Phast.Tabs"
         Title="Phast" Width="1280" Height="800" MinWidth="500" MinHeight="300"
         Background="{DynamicResource FrameBrush}"
         FontFamily="{StaticResource UiFont}"
@@ -20,16 +21,19 @@
         <controls:NotNullToVisibleConverter x:Key="NotNullToVisible"/>
 
         <!-- One tab in the tab strip. -->
-        <DataTemplate x:Key="TabTemplate">
+        <DataTemplate DataType="{x:Type tabs:BrowserTab}">
             <Grid x:Name="TabRoot" Height="34" Background="Transparent" ToolTip="{Binding DisplayTitle}"
                   shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                  MouseLeftButtonDown="Tab_MouseLeftButtonDown" MouseUp="Tab_MouseUp">
+                  MouseLeftButtonDown="Tab_MouseLeftButtonDown" MouseUp="Tab_MouseUp" MouseRightButtonUp="Tab_MouseRightButtonUp">
                 <Border x:Name="Shape" CornerRadius="8,8,0,0" Background="Transparent" Margin="0,0,0,0"/>
                 <!-- Concave "feet" that connect the active tab with the toolbar, like Chrome. -->
                 <Path x:Name="FootLeft" Data="M0,8 A8,8 0 0 0 8,0 L8,8 Z" Width="8" Height="8" Margin="-8,0,0,0"
                       HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="{DynamicResource ToolbarBrush}" Visibility="Collapsed"/>
                 <Path x:Name="FootRight" Data="M0,0 A8,8 0 0 0 8,8 L0,8 Z" Width="8" Height="8" Margin="0,0,-8,0"
                       HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="{DynamicResource ToolbarBrush}" Visibility="Collapsed"/>
+                <!-- Colored line under the tabs of a group -->
+                <Rectangle Height="2" VerticalAlignment="Bottom" Margin="6,0,6,0" RadiusX="1" RadiusY="1"
+                           Fill="{Binding Group.Brush}" Visibility="{Binding Group, Converter={StaticResource NotNullToVisible}}"/>
                 <Rectangle Width="1" Height="18" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,0"
                            Fill="{DynamicResource TabSeparatorBrush}" Opacity="0.6"
                            Visibility="{Binding ShowSeparator, Converter={StaticResource BoolToVis}}"/>
@@ -107,6 +111,35 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
+
+        <!-- Tab group label ("chip"): click to collapse/expand, right click for options. -->
+        <DataTemplate DataType="{x:Type tabs:TabGroup}">
+            <Button Height="34" Cursor="Hand" ToolTip="{Binding Name}" Focusable="False"
+                    AutomationProperties.AutomationId="GroupChip" AutomationProperties.Name="{Binding Name}"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    Click="GroupChip_Click" MouseRightButtonUp="GroupChip_MouseRightButtonUp">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter Margin="6,0,4,2" VerticalAlignment="Center"/>
+                    </ControlTemplate>
+                </Button.Template>
+                <Border x:Name="Chip" Background="{Binding Brush}" CornerRadius="6" Height="22" MinWidth="14" Padding="8,0">
+                    <TextBlock x:Name="ChipText" Text="{Binding Name}" Foreground="{Binding Foreground}" FontSize="12" FontWeight="SemiBold"
+                               VerticalAlignment="Center" MaxWidth="160" TextTrimming="CharacterEllipsis"/>
+                </Border>
+            </Button>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Name}" Value="">
+                    <Setter TargetName="Chip" Property="Width" Value="14"/>
+                    <Setter TargetName="Chip" Property="Height" Value="14"/>
+                    <Setter TargetName="Chip" Property="Padding" Value="0"/>
+                    <Setter TargetName="Chip" Property="CornerRadius" Value="7"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                    <Setter TargetName="Chip" Property="Opacity" Value="0.85"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid x:Name="RootGrid">
@@ -125,7 +158,17 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel x:Name="TabArea" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="8,0,0,0">
-                <ItemsControl x:Name="TabsList" ItemTemplate="{StaticResource TabTemplate}" Focusable="False">
+                <ItemsControl x:Name="TabsList" Focusable="False">
+                    <!-- Tabs of a collapsed group are hidden -->
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Group.IsCollapsed, FallbackValue=False}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <controls:TabStripPanel/>
@@ -166,6 +209,9 @@
 
                 <!-- Extension / action icons will live here. -->
                 <StackPanel x:Name="ActionsBar" DockPanel.Dock="Right" Orientation="Horizontal">
+                    <!-- Saved page groups ("Trabajo", "Ocio"...) -->
+                    <Button x:Name="PageGroupsButton" Style="{StaticResource ToolbarButton}" Content="&#xE71D;" Click="PageGroups_Click"
+                            ToolTip="Grupos de páginas"/>
                     <!-- Instant dark mode for the current site -->
                     <Button x:Name="DarkButton" Style="{StaticResource ToolbarButton}" Content="&#xE708;" Click="Dark_Click"
                             ToolTip="Modo oscuro en esta web (Ctrl+Mayús+D)"/>

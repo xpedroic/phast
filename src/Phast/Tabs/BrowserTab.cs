@@ -58,7 +58,9 @@ public sealed partial class BrowserTab : ObservableObject
     public string DisplayTitle =>
         !string.IsNullOrWhiteSpace(_title) ? _title
         : InternalPages.IsNewTab(_url) || string.IsNullOrEmpty(_url) ? "Nueva pestaña"
-        : UrlResolver.ToDisplay(_url);
+        : Uri.TryCreate(_url, UriKind.Absolute, out var u) && u.Scheme is "http" or "https"
+            ? (u.Host.StartsWith("www.") ? u.Host[4..] : u.Host)   // not loaded yet: show the site name
+            : UrlResolver.ToDisplay(_url);
 
     /// <summary>The real URL (internal pages use https://phast.internal/...).</summary>
     public string Url
@@ -75,6 +77,10 @@ public sealed partial class BrowserTab : ObservableObject
     public bool ShowSeparator { get => _showSeparator; set => Set(ref _showSeparator, value); }
     public bool IsAudible { get => _isAudible; private set => Set(ref _isAudible, value); }
     public bool IsMuted { get => _isMuted; private set => Set(ref _isMuted, value); }
+
+    private TabGroup? _group;
+    /// <summary>Tab group this tab belongs to (null = ungrouped). Managed by <see cref="TabManager"/>.</summary>
+    public TabGroup? Group { get => _group; set => Set(ref _group, value); }
 
     /// <summary>The page asked to open a popup / new tab.</summary>
     public event EventHandler<CoreWebView2NewWindowRequestedEventArgs>? NewWindowRequested;

@@ -85,6 +85,24 @@ a.link { color: var(--accent); }
 }
 .toast.show { opacity: 1; transform: none; }
 
+/* Page groups editor */
+.group-card { margin-top: 12px; padding: 14px 20px 16px; }
+.group-head { display: flex; align-items: center; gap: 12px; }
+.group-head input {
+  flex: 1; height: 34px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font: inherit; font-weight: 600;
+}
+.swatches { display: flex; gap: 6px; margin: 12px 0; }
+.swatch { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.swatch.selected { border-color: var(--text); }
+.group-card textarea {
+  width: 100%; min-height: 96px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font: 13px Consolas, "Cascadia Mono", monospace; resize: vertical;
+}
+.group-card input:focus, .group-card textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.group-foot { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.group-foot .muted { flex: 1; font-size: 12px; }
+
 .no-results { display: none; padding: 40px; text-align: center; color: var(--text-2); }
 
 @media (max-width: 860px) { nav { display: none; } }

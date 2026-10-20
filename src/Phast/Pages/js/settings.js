@@ -15,6 +15,7 @@
       else el.value = value;
     }
     renderDarkSites(msg.settings);
+    renderGroups(msg.settings.pageGroups);
     document.getElementById("version").textContent = msg.version || "";
     document.getElementById("engineVersion").textContent = msg.engineVersion || "";
   });
@@ -32,6 +33,88 @@
     box.querySelectorAll("[data-dark-remove]").forEach((b) =>
       b.addEventListener("click", () => phast.send("dark.remove", { site: b.dataset.darkRemove })));
   }
+
+  // ---- page groups editor
+  const GROUP_COLORS = [
+    ["grey", "#5F6368", "#DADCE0"], ["blue", "#1A73E8", "#8AB4F8"], ["red", "#D93025", "#F28B82"],
+    ["yellow", "#E8A600", "#FDD663"], ["green", "#188038", "#81C995"], ["pink", "#D01884", "#FF8BCB"],
+    ["purple", "#A142F4", "#C58AF9"], ["cyan", "#007B83", "#78D9EC"], ["orange", "#FA903E", "#FCAD70"],
+  ];
+  const darkScheme = () => matchMedia("(prefers-color-scheme: dark)").matches;
+  const colorHex = (id) => (GROUP_COLORS.find((c) => c[0] === id) || GROUP_COLORS[1])[darkScheme() ? 2 : 1];
+  let groups = [];
+  let lastSentGroups = "";
+  let saveTimer = 0;
+
+  function saveGroups() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      lastSentGroups = JSON.stringify(groups);
+      phast.send("settings.set", { key: "pageGroups", value: groups });
+    }, 350);
+  }
+
+  function renderGroups(fromBrowser) {
+    // Don't redraw (and lose the cursor) when the update is just the echo of our own change.
+    if (fromBrowser && JSON.stringify(fromBrowser) === lastSentGroups) return;
+    groups = fromBrowser || groups;
+    const box = document.getElementById("pageGroups");
+    box.innerHTML = groups.map((g, i) => `
+      <div class="card group-card" data-i="${i}">
+        <div class="group-head">
+          <input value="${esc(g.name)}" placeholder="Nombre del grupo" data-field="name" aria-label="Nombre del grupo">
+          <button class="btn" data-action="open" ${g.urls.length ? "" : "disabled"}>Abrir</button>
+          <button class="btn" data-action="delete">Eliminar</button>
+        </div>
+        <div class="swatches">${GROUP_COLORS.map((c) =>
+          `<button class="swatch ${c[0] === g.color ? "selected" : ""}" data-color="${c[0]}" title="${c[0]}" style="background:${colorHex(c[0])}"></button>`).join("")}</div>
+        <textarea data-field="urls" placeholder="Una web por línea, por ejemplo:&#10;gmail.com&#10;https://calendar.google.com">${esc(g.urls.join("\n"))}</textarea>
+        <div class="group-foot">
+          <span class="muted">${g.urls.length} ${g.urls.length === 1 ? "página" : "páginas"}</span>
+          <button class="btn" data-action="tabs">Añadir las pestañas abiertas</button>
+        </div>
+      </div>`).join("");
+  }
+
+  const pageGroupsBox = document.getElementById("pageGroups");
+  pageGroupsBox.addEventListener("input", (e) => {
+    const card = e.target.closest(".group-card");
+    if (!card) return;
+    const g = groups[+card.dataset.i];
+    if (e.target.dataset.field === "name") g.name = e.target.value;
+    if (e.target.dataset.field === "urls") {
+      g.urls = e.target.value.split("\n").map((u) => u.trim()).filter(Boolean);
+      card.querySelector(".muted").textContent = `${g.urls.length} ${g.urls.length === 1 ? "página" : "páginas"}`;
+      card.querySelector('[data-action="open"]').disabled = g.urls.length === 0;
+    }
+    saveGroups();
+  });
+  pageGroupsBox.addEventListener("click", (e) => {
+    const card = e.target.closest(".group-card");
+    if (!card) return;
+    const i = +card.dataset.i, g = groups[i];
+    if (e.target.dataset.color) { g.color = e.target.dataset.color; saveGroups(); renderGroups(); }
+    const action = e.target.dataset.action;
+    if (action === "delete") { groups.splice(i, 1); saveGroups(); renderGroups(); }
+    if (action === "open") phast.send("groups.open", { id: g.id });
+    if (action === "tabs") { pendingTabsFor = g.id; phast.send("groups.currentTabs"); }
+  });
+  let pendingTabsFor = null;
+  phast.on("currentTabs", (msg) => {
+    const g = groups.find((x) => x.id === pendingTabsFor);
+    if (!g) return;
+    for (const u of msg.urls) if (!g.urls.includes(u)) g.urls.push(u);
+    saveGroups();
+    renderGroups();
+  });
+  document.getElementById("addGroup").addEventListener("click", () => {
+    const used = groups.map((g) => g.color);
+    const color = (GROUP_COLORS.slice(1).find((c) => !used.includes(c[0])) || GROUP_COLORS[1])[0];
+    groups.push({ id: Math.random().toString(36).slice(2, 10), name: "", color, urls: [] });
+    saveGroups();
+    renderGroups();
+    pageGroupsBox.querySelector(".group-card:last-child input").focus();
+  });
 
   // ---- send changes back
   for (const el of controls()) {

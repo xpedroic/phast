@@ -44,12 +44,24 @@ public partial class MainWindow
             _dragging = true;
         }
 
-        var count = Tabs.Tabs.Count;
-        if (count < 2 || TabsList.ActualWidth <= 0) return;
-        var slot = TabsList.ActualWidth / count;
-        var target = Math.Clamp((int)(pos.X / slot), 0, count - 1);
+        if (Tabs.Tabs.Count < 2) return;
+        var target = TabIndexAt(pos.X);
         var from = Tabs.Tabs.IndexOf(_dragTab);
-        if (from >= 0 && target != from) Tabs.Move(from, target);
+        if (from >= 0 && target >= 0 && target != from) Tabs.Move(from, target);
+    }
+
+    /// <summary>Index (in Tabs) of the visible tab under the given X position of the strip (group labels are skipped).</summary>
+    private int TabIndexAt(double x)
+    {
+        var last = -1;
+        foreach (var tab in Tabs.Tabs)
+        {
+            if (TabsList.ItemContainerGenerator.ContainerFromItem(tab) is not FrameworkElement c || !c.IsVisible) continue;
+            var left = c.TranslatePoint(new Point(0, 0), TabsList).X;
+            if (x < left + c.ActualWidth) return Tabs.Tabs.IndexOf(tab);
+            last = Tabs.Tabs.IndexOf(tab);
+        }
+        return last;
     }
 
     private void EndDrag()

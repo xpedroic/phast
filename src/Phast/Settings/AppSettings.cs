@@ -4,6 +4,15 @@ public enum ThemeMode { System, Light, Dark }
 
 public enum StartupMode { RestoreSession, NewTab }
 
+/// <summary>A saved group of pages ("Trabajo", "Ocio"...) opened together from the toolbar.</summary>
+public sealed class PageGroup
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString("N")[..8];
+    public string Name { get; set; } = "";
+    public string Color { get; set; } = "blue";
+    public List<string> Urls { get; set; } = [];
+}
+
 /// <summary>
 /// All user-configurable options. Serialized to settings.json.
 /// New options must have a sensible default so old settings files keep working.
@@ -44,4 +53,7 @@ public sealed class AppSettings
 
     // Startup
     public StartupMode Startup { get; set; } = StartupMode.RestoreSession;
+
+    // Page groups
+    public List<PageGroup> PageGroups { get; set; } = [];
 }

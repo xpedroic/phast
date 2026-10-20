@@ -8,11 +8,23 @@ public sealed class SessionTab
     public string Title { get; set; } = "";
     /// <summary>Base64 PNG favicon so restored (not yet loaded) tabs still show their icon.</summary>
     public string? Favicon { get; set; }
+    /// <summary>Id of the tab group (see <see cref="SessionWindow.Groups"/>), if any.</summary>
+    public string? GroupId { get; set; }
+}
+
+public sealed class SessionGroup
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Color { get; set; } = "blue";
+    public bool Collapsed { get; set; }
+    public string? PageGroupId { get; set; }
 }
 
 public sealed class SessionWindow
 {
     public List<SessionTab> Tabs { get; set; } = [];
+    public List<SessionGroup> Groups { get; set; } = [];
     public int ActiveIndex { get; set; }
     public double Left { get; set; } = double.NaN;
     public double Top { get; set; } = double.NaN;

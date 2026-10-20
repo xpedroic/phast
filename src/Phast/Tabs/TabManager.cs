@@ -12,13 +12,17 @@ public sealed record ClosedTab(string Url, string Title, byte[]? FaviconPng, int
 /// Owns the tabs of one window: creation, activation, closing, reordering and "reopen closed tab".
 /// WebViews live stacked inside <see cref="Host"/>; only the active one is visible.
 /// </summary>
-public sealed class TabManager : ObservableObject
+public sealed partial class TabManager : ObservableObject
 {
     private const int MaxClosedTabs = 25;
     private readonly Stack<ClosedTab> _closed = new();
     private BrowserTab? _active;
 
-    public TabManager(Panel host) => Host = host;
+    public TabManager(Panel host)
+    {
+        Host = host;
+        Tabs.CollectionChanged += (_, _) => SyncStrip();
+    }
 
     public Panel Host { get; }
     public ObservableCollection<BrowserTab> Tabs { get; } = new();
@@ -51,7 +55,10 @@ public sealed class TabManager : ObservableObject
     public BrowserTab OpenNextToActive(string url, bool activate)
     {
         var idx = Active != null ? Tabs.IndexOf(Active) + 1 : Tabs.Count;
-        return Open(url, activate, idx);
+        var group = Active?.Group;
+        var tab = Open(url, activate, idx);
+        if (group != null) SetGroup(tab, group);
+        return tab;
     }
 
     private void Attach(BrowserTab tab)
@@ -61,13 +68,14 @@ public sealed class TabManager : ObservableObject
         tab.FullScreenChanged += (_, full) => { if (tab == Active) FullScreenChanged?.Invoke(this, full); };
         tab.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(BrowserTab.Url) or nameof(BrowserTab.Title))
+            if (e.PropertyName is nameof(BrowserTab.Url) or nameof(BrowserTab.Title) or nameof(BrowserTab.Group))
                 SessionDirty?.Invoke(this, EventArgs.Empty);
         };
     }
 
     public async void Activate(BrowserTab tab)
     {
+        if (tab.Group is { IsCollapsed: true } collapsed) SetCollapsed(collapsed, false);
         if (Active == tab) return;
         Active?.SetActive(false);
         Active = tab;
@@ -139,6 +147,7 @@ public sealed class TabManager : ObservableObject
     {
         if (from == to || from < 0 || to < 0 || from >= Tabs.Count || to >= Tabs.Count) return;
         Tabs.Move(from, to);
+        FixGroupAfterMove(Tabs[to]);
         UpdateSeparators();
         SessionDirty?.Invoke(this, EventArgs.Empty);
     }
@@ -186,6 +195,7 @@ public sealed class TabManager : ObservableObject
             var tab = new BrowserTab(null);
             Attach(tab);
             var idx = Active != null ? Tabs.IndexOf(Active) + 1 : Tabs.Count;
+            tab.Group = Active?.Group;
             Tabs.Insert(idx, tab);
             Activate(tab);
             await tab.EnsureWebViewAsync(Host);

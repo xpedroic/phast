@@ -27,7 +27,7 @@ public partial class MainWindow : Window
 
         _frame = new WindowFrame(this, RootGrid, MaximizeButton);
         Tabs = new TabManager(WebHost);
-        TabsList.ItemsSource = Tabs.Tabs;
+        TabsList.ItemsSource = Tabs.StripItems;
 
         Tabs.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(TabManager.Active)) OnActiveTabChanged(); };
         Tabs.LastTabClosed += (_, _) => Close();
@@ -80,13 +80,18 @@ public partial class MainWindow : Window
             Height = Math.Max(MinHeight, restore.Height);
             if (restore.Maximized) WindowState = WindowState.Maximized;
 
+            var groups = restore.Groups.ToDictionary(g => g.Id, g =>
+                new TabGroup(g.Name, g.Color, g.PageGroupId) { Id = g.Id, IsCollapsed = g.Collapsed });
+
             // Restored tabs are lazy: only the active one creates a WebView.
             foreach (var t in restore.Tabs)
             {
                 byte[]? icon = null;
                 if (t.Favicon != null) { try { icon = Convert.FromBase64String(t.Favicon); } catch { } }
-                Tabs.Open(t.Url, activate: false, title: t.Title, faviconPng: icon);
+                var tab = Tabs.Open(t.Url, activate: false, title: t.Title, faviconPng: icon);
+                if (t.GroupId != null && groups.TryGetValue(t.GroupId, out var group)) tab.Group = group;
             }
+            Tabs.SyncStrip();
             if (Tabs.Tabs.Count > 0)
                 Tabs.ActivateIndex(Math.Clamp(restore.ActiveIndex, 0, Tabs.Tabs.Count - 1));
         }
@@ -121,6 +126,11 @@ public partial class MainWindow : Window
                 Url = t.Url,
                 Title = t.Title,
                 Favicon = t.FaviconPng != null && t.FaviconPng.Length < 16_000 ? Convert.ToBase64String(t.FaviconPng) : null,
+                GroupId = t.Group?.Id,
+            }).ToList(),
+            Groups = tabs.Select(t => t.Group).OfType<TabGroup>().Distinct().Select(g => new SessionGroup
+            {
+                Id = g.Id, Name = g.Name, Color = g.Color, Collapsed = g.IsCollapsed, PageGroupId = g.PageGroupId,
             }).ToList(),
             ActiveIndex = Tabs.Active != null ? Math.Max(0, tabs.IndexOf(Tabs.Active)) : 0,
             Left = bounds.Left,

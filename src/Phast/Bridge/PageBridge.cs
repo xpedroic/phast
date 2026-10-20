@@ -53,6 +53,26 @@ public static class PageBridge
                     AdblockBridge.Handle(tab, type, root);
                     break;
 
+                case "groups.open":
+                {
+                    var id = root.GetProperty("id").GetString();
+                    var pg = SettingsService.Current.PageGroups.FirstOrDefault(g => g.Id == id);
+                    if (pg != null) WindowOf(tab)?.Tabs.OpenPageGroup(pg);
+                    break;
+                }
+
+                case "groups.currentTabs":
+                {
+                    var urls = WindowOf(tab)?.Tabs.Tabs.Select(t => t.Url)
+                        .Where(u => u.Length > 0 && !InternalPages.IsInternal(u)).Distinct().ToList() ?? [];
+                    tab.PostMessage(new JsonObject
+                    {
+                        ["type"] = "currentTabs",
+                        ["urls"] = new JsonArray(urls.Select(u => (JsonNode)u!).ToArray()),
+                    }.ToJsonString());
+                    break;
+                }
+
                 case "dark.remove":
                     var site = root.GetProperty("site").GetString() ?? "";
                     SettingsService.Update(s => { s.DarkSites.Remove(site); s.DarkExcludedSites.Remove(site); });
@@ -89,6 +109,10 @@ public static class PageBridge
         };
         return msg.ToJsonString();
     }
+
+    /// <summary>The window that contains this tab.</summary>
+    private static MainWindow? WindowOf(BrowserTab tab) =>
+        SessionManager.Windows.FirstOrDefault(w => w.Tabs.Tabs.Contains(tab)) ?? SessionManager.LastActiveWindow;
 
     /// <summary>Sends a message to every loaded internal page (optionally only pages whose file name matches).</summary>
     public static void Broadcast(string json, string? page = null)
