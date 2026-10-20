@@ -110,6 +110,39 @@ public class FilterEngineTests
         Assert.Equal("", e.CosmeticCss("www.elpais.com"));
     }
 
+    [Fact]
+    public void Cosmetic_Generic_OnlyForTokensInPage()
+    {
+        var e = Engine("##.ad-box", "##.ad-box > .inner", "###top-banner", "##[data-ad-slot]", "example.org#@#.ad-box");
+        var sent = new HashSet<string>();
+
+        // Selectors without a class/id are part of the base CSS of every page.
+        Assert.Contains("[data-ad-slot]{display:none!important}", e.CosmeticCss("news.com"));
+
+        var css = e.GenericCssFor([".ad-box", ".other"], "news.com", sent);
+        Assert.Contains(".ad-box{display:none!important}", css);
+        Assert.Contains(".ad-box > .inner{display:none!important}", css);
+        Assert.DoesNotContain("#top-banner", css);
+
+        // Already sent selectors are not sent twice; new tokens bring their own.
+        var more = e.GenericCssFor([".ad-box", "#top-banner"], "news.com", sent);
+        Assert.Equal("#top-banner{display:none!important}\n", more);
+
+        // Site-specific exception.
+        Assert.DoesNotContain(".ad-box{", e.GenericCssFor([".ad-box"], "www.example.org", new HashSet<string>()));
+    }
+
+    [Fact]
+    public void GenericHideException_DisablesGenericHidingOnly_AndAllowsNoRequests()
+    {
+        var e = Engine("##.ad-box", "##[data-ad]", "shop.com##.promo", "||ads.net^", "@@||shop.com^$generichide");
+        Assert.Equal("", e.GenericCssFor([".ad-box"], "www.shop.com", new HashSet<string>()));
+        var baseCss = e.CosmeticCss("www.shop.com");
+        Assert.Contains(".promo", baseCss);            // site-specific rules still apply
+        Assert.DoesNotContain("[data-ad]", baseCss);   // generic ones don't
+        Assert.True(Blocks(e, "https://ads.net/x.js", page: "www.shop.com")); // network blocking unaffected
+    }
+
     [Theory]
     [InlineData("www.bbc.co.uk", "bbc.co.uk")]
     [InlineData("a.b.example.com", "example.com")]

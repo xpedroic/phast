@@ -13,6 +13,10 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - [ ] Funciones v1 (1–11)
   - [x] 1 Pestañas (hecho en la Fase 1)
   - [ ] 4 Historial y descargas → el usuario pidió dejarla PARA EL FINAL (después de la 11)
+  - [x] 6 CAMBIO DECIDIDO POR EL USUARIO: Phast NO tendrá soporte de extensiones (ni gestor de extensiones en ajustes). En su lugar, lo que hacen uBlock Origin Lite y TwiBlocker va INTEGRADO de serie y debe funcionar incluso mejor. Hecho:
+    - Twitch: vaft (TwitchAdSolutions, MIT, fork mantenido ryanbr) en Pages/scripts/twitch-vaft.js, se registra solo al entrar en twitch.tv, se actualiza cada 2 días (Adblock/SiteScripts.cs).
+    - YouTube: script propio Pages/scripts/youtube-adblock.js (quita adPlacements/playerAds/adSlots, salta anuncios, oculta anuncios del feed).
+    - Ocultación genérica tipo uBlock: Pages/scripts/cosmetic.js informa de clases/ids y el motor devuelve solo el CSS que encaja; respeta $generichide/$elemhide.
   - [x] 5 Adblock: motor propio (src/Phast/Adblock) con sintaxis ABP; listas EasyList, EasyPrivacy, EasyList Spanish (+ Cookie List opcional) descargadas y actualizadas cada 4 días; ~3 µs por petición en Release; escudo con contador y burbuja para desactivar por sitio; sección Privacidad en ajustes. PENDIENTE: comprobar visualmente la burbuja del escudo (el PC estaba bloqueado).
   - [x] 3 Marcadores: barra (carpetas, », clic derecho), estrella/Ctrl+D con burbuja, gestor phast://bookmarks (Ctrl+Mayús+O, arrastrar), importar de Chrome/Edge/Brave/Vivaldi (todos los perfiles + iconos) y HTML, exportar HTML. Pruebas automáticas en tests/Phast.Tests (se ejecutan en CI).
   - [x] 2 Barra de direcciones con sugerencias (historial SQLite, autocompletado, sugerencias del buscador) + buscador configurable en phast://settings (primera versión de ajustes: Apariencia, Buscador, Al iniciar)

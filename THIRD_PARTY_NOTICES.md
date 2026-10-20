@@ -35,6 +35,15 @@ The WebView2 Runtime itself is part of Windows and is not redistributed by Phast
 
 ---
 
+## TwitchAdSolutions — "vaft" (Twitch ad blocking)
+
+- Source: https://github.com/ryanbr/TwitchAdSolutions (maintained fork of https://github.com/pixeltris/TwitchAdSolutions)
+- License: MIT — full text in `src/Phast/Pages/scripts/twitch-vaft.LICENSE.txt`
+- Copyright (c) 2020-present TwitchAdSolutions Contributors. Credits: https://github.com/cleanlock/VideoAdBlockForTwitch#credits
+- Bundled unmodified as `src/Phast/Pages/scripts/twitch-vaft.js` and injected only into twitch.tv pages. If enabled in Settings, Phast downloads newer versions from the URL above.
+
+---
+
 ## Mozilla Readability
 
 - Source: https://github.com/mozilla/readability

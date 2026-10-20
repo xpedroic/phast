@@ -60,6 +60,7 @@ public static class AdblockBridge
             ["networkRules"] = engine?.NetworkRuleCount ?? 0,
             ["cosmeticRules"] = engine?.CosmeticRuleCount ?? 0,
             ["buildMs"] = (int)AdblockService.BuildTime.TotalMilliseconds,
+            ["twitchVersion"] = SiteScripts.TwitchVersion()?.ToString(),
             ["lists"] = new JsonArray(FilterLists.BuiltIn.Select(l => (JsonNode)new JsonObject
             {
                 ["id"] = l.Id,

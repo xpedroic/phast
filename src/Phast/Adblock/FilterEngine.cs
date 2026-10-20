@@ -23,9 +23,16 @@ public sealed class FilterEngine
     private volatile bool _compiled;
     private bool _hasImportant;
 
-    // Cosmetic (element hiding) rules, only the site-specific ones: generic ones would cost a huge stylesheet on every page.
+    // Cosmetic (element hiding) rules.
+    // Site-specific ones are applied in full. Generic ones ("##.ad-box") are indexed by their leading class/id so a page
+    // only receives the selectors for the classes/ids it actually contains (like uBlock Origin); the few generic
+    // selectors without a leading class/id ("##[data-ad-slot]") are always applied.
     private readonly Dictionary<string, List<string>> _hide = new(StringComparer.Ordinal);
     private readonly Dictionary<string, HashSet<string>> _unhide = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, List<string>> _genericByToken = new(StringComparer.Ordinal);
+    private readonly List<string> _highGeneric = [];
+    private readonly HashSet<string> _genericHideSites = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _elemHideSites = new(StringComparer.Ordinal);
 
     // Words too common to be useful as an index key.
     private static readonly HashSet<string> BadTokens = ["http", "https", "www", "com", "net", "org", "html", "js", "php", "jpg", "png", "gif"];
@@ -49,6 +56,14 @@ public sealed class FilterEngine
 
     public void AddRule(NetRule rule)
     {
+        // Cosmetic exceptions only switch element hiding off for a site; they must not allow network requests.
+        if (rule.IsGenericHideException || rule.IsElemHideException)
+        {
+            if (rule.AnchorHost.Length > 0)
+                (rule.IsElemHideException ? _elemHideSites : _genericHideSites).Add(rule.AnchorHost);
+            return;
+        }
+
         NetworkRuleCount++;
         _compiled = false;
         if (rule.IsDocumentException) { _documentExceptions.Add(rule); return; }
@@ -141,12 +156,18 @@ public sealed class FilterEngine
 
         var domains = line[..sep];
         var selector = line[(sep + sepLen)..].Trim();
-        // Skip generic rules, scriptlets (+js), HTML filters (^) and procedural/extended selectors.
-        if (domains.Length == 0 || selector.Length == 0 || selector.StartsWith('+') || selector.StartsWith('^')
+        // Skip scriptlets (+js), HTML filters (^) and procedural/extended selectors.
+        if (selector.Length == 0 || selector.StartsWith('+') || selector.StartsWith('^')
             || selector.Contains(":-abp-") || selector.Contains(":has-text(") || selector.Contains(":style(")
             || selector.Contains(":xpath(") || selector.Contains(":matches-") || selector.Contains(":upward(")
             || selector.Contains(":remove(") || selector.Contains(":watch-attr(") || selector.Contains(":min-text-length("))
             return true;
+
+        if (domains.Length == 0)
+        {
+            if (!exception) AddGenericSelector(selector); // generic exceptions without a site are very rare: ignored
+            return true;
+        }
 
         foreach (var d in domains.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
@@ -165,6 +186,39 @@ public sealed class FilterEngine
             }
         }
         return true;
+    }
+
+    private void AddGenericSelector(string selector)
+    {
+        CosmeticRuleCount++;
+        var key = LeadingToken(selector);
+        if (key == null) { _highGeneric.Add(selector); return; }
+        if (!_genericByToken.TryGetValue(key, out var list)) _genericByToken[key] = list = [];
+        list.Add(selector);
+    }
+
+    /// <summary>".ad-box > div" → ".ad-box"; "#banner" → "#banner"; anything else → null.</summary>
+    private static string? LeadingToken(string selector)
+    {
+        if (selector.Length < 2 || selector[0] is not ('.' or '#')) return null;
+        var end = 1;
+        while (end < selector.Length && (char.IsAsciiLetterOrDigit(selector[end]) || selector[end] is '-' or '_')) end++;
+        if (end == 1) return null;
+        if (end < selector.Length && selector[end] == '\\') return null; // escaped characters: keep it simple
+        return selector[..end];
+    }
+
+    public int GenericSelectorCount => _genericByToken.Values.Sum(l => l.Count) + _highGeneric.Count;
+
+    private static bool SiteIn(HashSet<string> sites, string docHost)
+    {
+        for (var h = docHost; ; )
+        {
+            if (sites.Contains(h)) return true;
+            var dot = h.IndexOf('.');
+            if (dot < 0) return false;
+            h = h[(dot + 1)..];
+        }
     }
 
     // ------------------------------------------------------------------ querying
@@ -252,21 +306,58 @@ public sealed class FilterEngine
         return found;
     }
 
-    /// <summary>CSS that hides ad containers on this site (empty if none).</summary>
+    /// <summary>
+    /// CSS for the start of a page: the site-specific rules plus the generic selectors that don't depend
+    /// on a class/id. Empty if element hiding is off for this site.
+    /// </summary>
     public string CosmeticCss(string docHost)
     {
+        if (SiteIn(_elemHideSites, docHost)) return "";
+        var unhide = Unhidden(docHost);
         var selectors = new List<string>();
-        var unhide = new HashSet<string>();
         for (var h = docHost; ; )
         {
             if (_hide.TryGetValue(h, out var list)) selectors.AddRange(list);
-            if (_unhide.TryGetValue(h, out var set)) unhide.UnionWith(set);
             var dot = h.IndexOf('.');
             if (dot < 0) break;
             h = h[(dot + 1)..];
         }
-        // One rule per selector, so one invalid selector can't disable the others.
-        return string.Concat(selectors.Where(s => !unhide.Contains(s)).Distinct()
-            .Select(s => s + "{display:none!important}\n"));
+        if (!SiteIn(_genericHideSites, docHost)) selectors.AddRange(_highGeneric);
+        return ToCss(selectors.Where(s => !unhide.Contains(s)).Distinct());
     }
+
+    /// <summary>
+    /// Generic selectors whose leading class/id appears in the page (tokens like ".ad-box" or "#banner"),
+    /// skipping the ones in <paramref name="alreadySent"/> (which is updated).
+    /// </summary>
+    public string GenericCssFor(IEnumerable<string> pageTokens, string docHost, HashSet<string> alreadySent)
+    {
+        if (SiteIn(_elemHideSites, docHost) || SiteIn(_genericHideSites, docHost)) return "";
+        HashSet<string>? unhide = null;
+        var selectors = new List<string>();
+        foreach (var token in pageTokens)
+        {
+            if (!_genericByToken.TryGetValue(token, out var list)) continue;
+            unhide ??= Unhidden(docHost);
+            foreach (var s in list)
+                if (!unhide.Contains(s) && alreadySent.Add(s)) selectors.Add(s);
+        }
+        return ToCss(selectors);
+    }
+
+    private HashSet<string> Unhidden(string docHost)
+    {
+        var unhide = new HashSet<string>(StringComparer.Ordinal);
+        for (var h = docHost; ; )
+        {
+            if (_unhide.TryGetValue(h, out var set)) unhide.UnionWith(set);
+            var dot = h.IndexOf('.');
+            if (dot < 0) return unhide;
+            h = h[(dot + 1)..];
+        }
+    }
+
+    // One rule per selector, so one invalid selector can't disable the others.
+    private static string ToCss(IEnumerable<string> selectors) =>
+        string.Concat(selectors.Select(s => s + "{display:none!important}\n"));
 }

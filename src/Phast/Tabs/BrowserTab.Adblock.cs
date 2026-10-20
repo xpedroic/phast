@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.Web.WebView2.Core;
 using Phast.Adblock;
 using Phast.Core;
@@ -40,7 +39,6 @@ public sealed partial class BrowserTab
         EnsureRequestFilter();
         core.NavigationStarting += (_, e) => OnMainNavigationStarting(e.Uri, e.IsRedirected);
         core.WebResourceRequested += OnWebResourceRequested;
-        core.DOMContentLoaded += (_, _) => InjectCosmeticFilters();
     }
 
     /// <summary>
@@ -111,21 +109,4 @@ public sealed partial class BrowserTab
         CoreWebView2WebResourceContext.Ping => ResourceType.Ping,
         _ => ResourceType.Other,
     };
-
-    /// <summary>Hides leftover ad boxes using the site-specific element hiding rules of the lists.</summary>
-    private void InjectCosmeticFilters()
-    {
-        if (!_blockingActive || !SettingsService.Current.AdblockCosmetic || Core == null) return;
-        var css = AdblockService.Engine?.CosmeticCss(_docHost);
-        if (string.IsNullOrEmpty(css)) return;
-        var script = $$"""
-            (() => {
-              const s = document.createElement('style');
-              s.id = 'phast-adblock';
-              s.textContent = {{JsonSerializer.Serialize(css)}};
-              (document.head || document.documentElement).appendChild(s);
-            })();
-            """;
-        _ = Core.ExecuteScriptAsync(script);
-    }
 }

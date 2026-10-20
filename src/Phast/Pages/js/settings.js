@@ -98,6 +98,8 @@
     summary.textContent = msg.updating ? "Descargando listas..."
       : msg.ready ? `${msg.networkRules.toLocaleString("es")} reglas activas · preparadas en ${msg.buildMs} ms · se actualizan solas cada 4 días`
       : "Las listas aún no se han descargado";
+    if (msg.twitchVersion)
+      document.getElementById("twitchInfo").textContent = `Usa vaft ${msg.twitchVersion}, de TwitchAdSolutions (licencia MIT)`;
 
     document.getElementById("filterLists").innerHTML = msg.lists.map((l) => `
       <div class="row">

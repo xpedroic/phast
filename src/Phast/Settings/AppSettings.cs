@@ -27,6 +27,12 @@ public sealed class AppSettings
     public List<string> FilterLists { get; set; } = ["easylist", "easyprivacy", "easylist-es"];
     /// <summary>Sites where blocking is turned off by the user (host names).</summary>
     public List<string> AdblockAllowlist { get; set; } = [];
+    /// <summary>Built-in Twitch ad blocker (replaces extensions like TwiBlocker).</summary>
+    public bool TwitchAdblock { get; set; } = true;
+    /// <summary>Built-in YouTube ad blocker.</summary>
+    public bool YouTubeAdblock { get; set; } = true;
+    /// <summary>Keep the Twitch blocker script up to date from its project (Twitch changes often).</summary>
+    public bool SiteScriptsAutoUpdate { get; set; } = true;
 
     // Startup
     public StartupMode Startup { get; set; } = StartupMode.RestoreSession;

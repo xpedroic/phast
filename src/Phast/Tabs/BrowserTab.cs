@@ -135,7 +135,11 @@ public sealed partial class BrowserTab : ObservableObject
         core.IsMutedChanged += (_, _) => IsMuted = core.IsMuted;
         core.WebMessageReceived += OnWebMessageReceived;
 
+        InitSiteScripts(core);
         InitAdblock(core, env);
+        try { await InitCosmeticAsync(core); }
+        catch (Exception ex) { Log.Write($"Cosmetic init failed: {ex.Message}"); }
+        if (WebView != webView) return;
 
         core.MemoryUsageTargetLevel = IsActive ? CoreWebView2MemoryUsageTargetLevel.Normal : CoreWebView2MemoryUsageTargetLevel.Low;
 
@@ -197,8 +201,12 @@ public sealed partial class BrowserTab : ObservableObject
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
-        // Only Phast's own pages may talk to the browser.
-        if (!e.Source.StartsWith(InternalPages.Origin + "/", StringComparison.OrdinalIgnoreCase)) return;
+        // Only Phast's own pages may talk to the browser. Web pages can only report class names for element hiding.
+        if (!e.Source.StartsWith(InternalPages.Origin + "/", StringComparison.OrdinalIgnoreCase))
+        {
+            TryHandleCosmeticMessage(e.WebMessageAsJson);
+            return;
+        }
         PageBridge.Handle(this, e.WebMessageAsJson);
     }
 

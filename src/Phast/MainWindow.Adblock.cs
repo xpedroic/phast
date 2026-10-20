@@ -1,4 +1,5 @@
 using System.Windows;
+using Phast.Core;
 using Phast.Settings;
 
 namespace Phast;
@@ -16,7 +17,12 @@ public partial class MainWindow
     private void OnAdblockSettingsChanged()
     {
         // Turning the blocker on must start routing requests in tabs that are already open.
-        foreach (var tab in Tabs.Tabs) tab.EnsureRequestFilter();
+        foreach (var tab in Tabs.Tabs)
+        {
+            tab.EnsureRequestFilter();
+            tab.RefreshSiteScripts();
+            tab.RefreshCosmeticScriptAsync().Forget();
+        }
         UpdateShield();
     }
 

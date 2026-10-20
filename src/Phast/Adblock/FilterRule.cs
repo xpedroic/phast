@@ -45,6 +45,15 @@ public sealed class NetRule
     public string[]? ExcludeDomains { get; init; }
     /// <summary>"@@||site^$document": disables blocking on that whole site.</summary>
     public bool IsDocumentException { get; init; }
+    /// <summary>"@@||site^$generichide": don't apply generic element hiding on that site.</summary>
+    public bool IsGenericHideException { get; init; }
+    /// <summary>"@@||site^$elemhide": don't apply any element hiding on that site.</summary>
+    public bool IsElemHideException { get; init; }
+
+    /// <summary>Host part of a "||host..." pattern (e.g. "example.com" for "||example.com/path^").</summary>
+    public string AnchorHost =>
+        HostAnchor ? new string(Pattern.TakeWhile(c => char.IsAsciiLetterOrDigit(c) || c is '.' or '-' or '_').ToArray()) : "";
+
     /// <summary>For pure "||host^" rules: the host, set by the engine when indexing.</summary>
     public string Host { get; internal set; } = "";
 
@@ -76,6 +85,7 @@ public sealed class NetRule
         var party = Party.Any;
         var important = false;
         var isDocException = false;
+        bool genericHide = false, elemHide = false;
         ResourceType include = ResourceType.None, exclude = ResourceType.None;
         string[]? incDomains = null, excDomains = null;
 
@@ -108,6 +118,14 @@ public sealed class NetRule
                     case "document" or "doc":
                         if (exception && !neg) { isDocException = true; continue; }
                         return null; // we never block whole pages
+                    case "generichide" or "ghide":
+                        if (exception && !neg) { genericHide = true; continue; }
+                        return null;
+                    case "elemhide" or "ehide":
+                        if (exception && !neg) { elemHide = true; continue; }
+                        return null;
+                    case "specifichide" or "shide":
+                        return null; // rare; not supported
                 }
 
                 var type = TypeFromName(name);
@@ -116,9 +134,10 @@ public sealed class NetRule
             }
         }
 
+        var cosmeticException = genericHide || elemHide;
         var types = include != ResourceType.None ? include : ResourceType.AllButDocument;
         types &= ~exclude;
-        if (types == ResourceType.None && !isDocException) return null;
+        if (types == ResourceType.None && !isDocException && !cosmeticException) return null;
 
         pattern = pattern.ToLowerInvariant();
         bool hostAnchor = false, startAnchor = false, endAnchor = false;
@@ -131,7 +150,7 @@ public sealed class NetRule
         if (pattern.EndsWith('*')) { pattern = pattern.TrimEnd('*'); endAnchor = false; }
 
         // An empty pattern, or just a scheme like "|https:", without domain restrictions would block everything: refuse it.
-        if (incDomains == null && !isDocException &&
+        if (incDomains == null && !isDocException && !cosmeticException &&
             (pattern.Length == 0 || startAnchor && pattern.TrimEnd('/') is "http:" or "https:" or "ws:" or "wss:"))
             return null;
 
@@ -148,6 +167,8 @@ public sealed class NetRule
             IncludeDomains = incDomains,
             ExcludeDomains = excDomains,
             IsDocumentException = isDocException,
+            IsGenericHideException = genericHide,
+            IsElemHideException = elemHide,
         };
     }
 

@@ -31,6 +31,7 @@ public static class AdblockService
         {
             Rebuild();
             await UpdateAsync(force: false).ConfigureAwait(false);
+            await SiteScripts.UpdateTwitchAsync().ConfigureAwait(false);
         });
     }
 
