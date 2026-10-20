@@ -122,6 +122,7 @@ public partial class MainWindow : Window
     {
         var bounds = WindowState == WindowState.Normal && !_isFullScreen ? new Rect(Left, Top, Width, Height) : RestoreBounds;
         if (_isFullScreen) bounds = _boundsBeforeFullScreen;
+        if (bounds.IsEmpty || double.IsInfinity(bounds.Left)) bounds = new Rect(double.NaN, double.NaN, Width, Height); // never in normal state
         var tabs = Tabs.Tabs.Where(t => !string.IsNullOrEmpty(t.Url)).ToList();
         return new SessionWindow
         {
