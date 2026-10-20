@@ -37,6 +37,7 @@ public sealed partial class BrowserTab : ObservableObject
         _url = url ?? "";
         _title = title ?? "";
         if (faviconPng != null) SetFaviconFromPng(faviconPng);
+        else Favicon = FaviconCache.Get(url); // known site: show its icon even before the tab loads
     }
 
     public WebView2? WebView { get; private set; }

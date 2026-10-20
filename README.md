@@ -23,7 +23,14 @@ Lo que lo hace especial:
 
 ### Capturas
 
-_Próximamente._
+![Phast con grupos de pestañas y barra de marcadores](docs/screenshots/phast-light.png)
+
+| | |
+|---|---|
+| ![Bloqueador de anuncios integrado (escudo con contador) en tema oscuro](docs/screenshots/phast-dark-adblock.png) | ![Modo oscuro instantáneo en cualquier web](docs/screenshots/dark-mode.png) |
+| *Bloqueador de anuncios integrado, tema oscuro* | *Modo oscuro instantáneo (Ctrl+Mayús+D)* |
+| ![Ajustes con el diseño de Chrome](docs/screenshots/settings.png) | ![Monitor de memoria y CPU por pestaña](docs/screenshots/developer-monitor.png) |
+| *Ajustes (phast://settings)* | *Modo desarrollador: monitor de pestañas* |
 
 ### Descargar
 
@@ -79,7 +86,14 @@ Highlights:
 
 ### Screenshots
 
-_Coming soon._
+![Phast with tab groups and the bookmarks bar](docs/screenshots/phast-light.png)
+
+| | |
+|---|---|
+| ![Built-in ad blocker (shield with counter), dark theme](docs/screenshots/phast-dark-adblock.png) | ![Instant dark mode on any website](docs/screenshots/dark-mode.png) |
+| *Built-in ad blocker, dark theme* | *Instant dark mode (Ctrl+Shift+D)* |
+| ![Chrome-style settings](docs/screenshots/settings.png) | ![Per-tab memory and CPU monitor](docs/screenshots/developer-monitor.png) |
+| *Settings (phast://settings)* | *Developer mode: tab monitor* |
 
 ### Download
 
