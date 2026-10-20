@@ -27,7 +27,21 @@ public static class FilterLists
     private static string Folder => Path.Combine(AppPaths.Root, "Filters");
     public static string FileFor(string id) => Path.Combine(Folder, id + ".txt");
 
-    public static FilterList? Get(string id) => BuiltIn.FirstOrDefault(l => l.Id == id);
+    public static FilterList? Get(string id) => BuiltIn.FirstOrDefault(l => l.Id == id) ?? Custom().FirstOrDefault(l => l.Id == id);
+
+    /// <summary>Lists added by the user in Settings > Advanced (id derived from the URL).</summary>
+    public static IEnumerable<FilterList> Custom() =>
+        Settings.SettingsService.Current.CustomFilterLists.Select(url => new FilterList(CustomId(url), url, url, "Lista añadida por ti"));
+
+    public static string CustomId(string url)
+    {
+        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(url.Trim()));
+        return "custom-" + Convert.ToHexString(hash)[..12].ToLowerInvariant();
+    }
+
+    /// <summary>Every list that should be active right now (enabled built-in ones + all custom ones).</summary>
+    public static IEnumerable<FilterList> Active() =>
+        Settings.SettingsService.Current.FilterLists.Select(id => BuiltIn.FirstOrDefault(l => l.Id == id)).OfType<FilterList>().Concat(Custom());
 
     public static DateTime? LastUpdated(string id) =>
         File.Exists(FileFor(id)) ? File.GetLastWriteTime(FileFor(id)) : null;

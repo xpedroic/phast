@@ -49,6 +49,12 @@ public static class PageBridge
                     BookmarksBridge.Handle(tab, type, root);
                     break;
 
+                case not null when type.StartsWith("dev.", StringComparison.Ordinal) || type.StartsWith("monitor.", StringComparison.Ordinal)
+                                   || type.StartsWith("tab.", StringComparison.Ordinal) || type.StartsWith("shortcuts.", StringComparison.Ordinal)
+                                   || type.StartsWith("site.", StringComparison.Ordinal):
+                    DeveloperBridge.Handle(tab, type, root);
+                    break;
+
                 case not null when type.StartsWith("adblock.", StringComparison.Ordinal):
                     AdblockBridge.Handle(tab, type, root);
                     break;

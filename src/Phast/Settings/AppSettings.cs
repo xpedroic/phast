@@ -56,4 +56,46 @@ public sealed class AppSettings
 
     // Page groups
     public List<PageGroup> PageGroups { get; set; } = [];
+
+    // ----- Advanced / developer mode -----
+    public bool DeveloperMode { get; set; }
+
+    // Performance
+    /// <summary>Background tabs are suspended (frozen, memory trimmed) after this many minutes. 0 = never.</summary>
+    public int SleepAfterMinutes { get; set; } = 10;
+    /// <summary>Background tabs are fully unloaded (keeping URL and title) after this many minutes. 0 = never.</summary>
+    public int DiscardAfterMinutes { get; set; } = 60;
+    /// <summary>Maximum loaded tabs; the least recently used background tabs are unloaded beyond it. 0 = no limit.</summary>
+    public int MaxLoadedTabs { get; set; }
+    /// <summary>GPU acceleration (needs a restart).</summary>
+    public bool GpuAcceleration { get; set; } = true;
+    /// <summary>Extra Chromium/WebView2 command-line flags (needs a restart).</summary>
+    public string BrowserFlags { get; set; } = "";
+
+    /// <summary>Keyboard shortcut overrides: command id → shortcut text ("Ctrl+Shift+K"); empty text = no shortcut.</summary>
+    public Dictionary<string, string> Shortcuts { get; set; } = [];
+
+    // Ad blocking (advanced)
+    /// <summary>Extra filter list URLs added by the user.</summary>
+    public List<string> CustomFilterLists { get; set; } = [];
+    /// <summary>User's own filter rules (Adblock Plus syntax, one per line).</summary>
+    public string CustomFilterRules { get; set; } = "";
+
+    /// <summary>Per-site tweaks, keyed by site (registrable domain, e.g. "example.com").</summary>
+    public Dictionary<string, SiteOverride> SiteOverrides { get; set; } = [];
+}
+
+/// <summary>Developer tweaks for one site.</summary>
+public sealed class SiteOverride
+{
+    public bool JavaScriptDisabled { get; set; }
+    /// <summary>Custom user agent ("" = default).</summary>
+    public string UserAgent { get; set; } = "";
+    /// <summary>CSS injected into every page of the site.</summary>
+    public string Css { get; set; } = "";
+    /// <summary>JavaScript run on every page of the site (when the page has loaded).</summary>
+    public string Js { get; set; } = "";
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool IsEmpty => !JavaScriptDisabled && UserAgent.Length == 0 && Css.Length == 0 && Js.Length == 0;
 }

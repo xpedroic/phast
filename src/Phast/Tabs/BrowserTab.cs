@@ -43,7 +43,7 @@ public sealed partial class BrowserTab : ObservableObject
     public CoreWebView2? Core => WebView?.CoreWebView2;
     public bool HasWebView => WebView != null;
 
-    /// <summary>When this tab was last shown; used to decide which tabs go to sleep.</summary>
+    /// <summary>Last time this tab was shown (or hidden); used to decide which tabs go to sleep.</summary>
     public DateTime LastActivated { get; private set; } = DateTime.Now;
 
     /// <summary>PNG bytes of the favicon, kept so sessions can restore it without loading the page.</summary>
@@ -144,6 +144,7 @@ public sealed partial class BrowserTab : ObservableObject
         InitSiteScripts(core);
         InitAdblock(core, env);
         InitDarkMode(core);
+        InitSiteOverrides(core);
         try { await InitCosmeticAsync(core); }
         catch (Exception ex) { Log.Write($"Cosmetic init failed: {ex.Message}"); }
         if (WebView != webView) return;
@@ -172,7 +173,7 @@ public sealed partial class BrowserTab : ObservableObject
     public void SetActive(bool active)
     {
         IsActive = active;
-        if (active) LastActivated = DateTime.Now;
+        LastActivated = DateTime.Now; // last time the tab was in use (shown or just hidden)
         if (WebView == null) return;
 
         // Hidden (not Collapsed) keeps layout size, so switching back is instant without a resize.
@@ -182,6 +183,7 @@ public sealed partial class BrowserTab : ObservableObject
             // Background tabs ask the engine to trim memory.
             Core.MemoryUsageTargetLevel = active ? CoreWebView2MemoryUsageTargetLevel.Normal : CoreWebView2MemoryUsageTargetLevel.Low;
             if (active && Core.IsSuspended) Core.Resume();
+            if (active) IsSuspended = false;
         }
     }
 

@@ -40,6 +40,16 @@ public static class AdblockBridge
                 });
                 AdblockService.OnListsChanged();
                 break;
+            case "adblock.setCustom":
+                var rules = msg.TryGetProperty("rules", out var r) ? r.GetString() ?? "" : SettingsService.Current.CustomFilterRules;
+                var urls = msg.TryGetProperty("lists", out var l) && l.ValueKind == JsonValueKind.Array
+                    ? l.EnumerateArray().Select(x => x.GetString() ?? "").Select(x => x.Trim())
+                        .Where(x => x.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || x.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                        .Distinct().ToList()
+                    : SettingsService.Current.CustomFilterLists;
+                SettingsService.Update(s => { s.CustomFilterRules = rules; s.CustomFilterLists = urls; });
+                AdblockService.OnListsChanged();
+                break;
             case "adblock.unallow":
                 var host = msg.GetProperty("host").GetString() ?? "";
                 SettingsService.Update(s => s.AdblockAllowlist.Remove(host));

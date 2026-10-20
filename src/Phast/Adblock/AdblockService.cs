@@ -38,7 +38,7 @@ public static class AdblockService
     /// <summary>Downloads lists that are missing or older than their expiry (or all of them when forced).</summary>
     public static async Task UpdateAsync(bool force)
     {
-        var lists = SettingsService.Current.FilterLists.Select(FilterLists.Get).OfType<FilterList>().ToList();
+        var lists = FilterLists.Active().ToList();
         var toFetch = lists.Where(l => force || FilterLists.IsStale(l.Id)).ToList();
         if (toFetch.Count == 0) return;
 
@@ -68,11 +68,13 @@ public static class AdblockService
         {
             var sw = Stopwatch.StartNew();
             var engine = new FilterEngine();
-            foreach (var id in SettingsService.Current.FilterLists)
+            foreach (var list in FilterLists.Active())
             {
-                var file = FilterLists.FileFor(id);
+                var file = FilterLists.FileFor(list.Id);
                 if (File.Exists(file)) engine.AddList(File.ReadLines(file));
             }
+            // The user's own rules (Settings > Advanced) come last.
+            engine.AddList(SettingsService.Current.CustomFilterRules.Split('\n'));
             engine.Compile();
             BuildTime = sw.Elapsed;
             BuiltAt = DateTime.Now;

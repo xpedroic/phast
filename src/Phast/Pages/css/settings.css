@@ -103,6 +103,46 @@ a.link { color: var(--accent); }
 .group-foot { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
 .group-foot .muted { flex: 1; font-size: 12px; }
 
+/* Developer mode */
+section h3 { font-size: 14px; font-weight: 600; margin: 22px 0 10px 4px; color: var(--text-2); }
+.card.pad { padding: 14px 20px 16px; }
+.num { width: 90px; height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; }
+textarea.code, .inline-form input, .site-card input, .site-card select {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font: 13px Consolas, "Cascadia Mono", monospace;
+}
+.inline-form { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+.inline-form input { flex: 1; height: 34px; font-family: inherit; }
+.field-label { display: block; margin: 8px 0 6px; font-size: 13px; }
+.field-label small, .muted { color: var(--text-2); }
+code { background: var(--surface); padding: 1px 4px; border-radius: 4px; }
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 12px 18px;
+  border-radius: 12px; background: color-mix(in srgb, var(--accent) 20%, var(--card)); }
+.banner[hidden], #devPanels[hidden] { display: none; }
+table.monitor { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.monitor th { text-align: left; font-weight: 500; color: var(--text-2); padding: 8px 12px; border-bottom: 1px solid var(--border); }
+table.monitor td { padding: 6px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.monitor td:last-child { text-align: right; }
+table.monitor td.title { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+table.monitor tr.active td.title { font-weight: 600; }
+.mini { height: 26px; min-width: 0; padding: 0 9px; border-radius: 13px; border: 1px solid var(--border); background: transparent;
+  color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; margin-left: 4px; }
+.mini:hover { background: var(--surface); }
+.linkish { background: none; border: 0; color: var(--accent); cursor: pointer; font: inherit; padding: 0; text-decoration: underline; }
+.monitor-summary { padding: 12px 16px; color: var(--text-2); font-size: 13px; }
+details.processes { padding: 6px 12px 12px; font-size: 13px; }
+details.processes summary { cursor: pointer; color: var(--text-2); padding: 6px 4px; }
+.shortcut-row { display: flex; align-items: center; gap: 12px; padding: 8px 20px; border-top: 1px solid var(--border); }
+.shortcut-row .name { flex: 1; }
+.kbd { display: inline-block; padding: 2px 8px; border-radius: 6px; background: var(--surface); font-size: 12px; margin-left: 4px; }
+.kbd.custom { outline: 1px solid var(--accent); }
+.kbd.waiting { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+.site-card { margin-top: 12px; padding: 14px 20px 16px; }
+.site-card .grid { display: grid; grid-template-columns: 170px 1fr; gap: 8px 14px; align-items: center; margin-top: 10px; }
+.site-card textarea { min-height: 70px; }
+.list-dialog { width: min(760px, 90vw); border: 0; border-radius: 12px; background: var(--card); color: var(--text); }
+.list-dialog pre { max-height: 60vh; overflow: auto; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+
 .no-results { display: none; padding: 40px; text-align: center; color: var(--text-2); }
 
 @media (max-width: 860px) { nav { display: none; } }

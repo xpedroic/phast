@@ -21,11 +21,24 @@ public static class BrowserEnvironment
     {
         var options = new CoreWebView2EnvironmentOptions
         {
-            // Extra flags will become configurable in Settings > Advanced.
-            AdditionalBrowserArguments = "",
+            AdditionalBrowserArguments = BrowserArguments(),
         };
+        StartedWith = options.AdditionalBrowserArguments;
         return await CoreWebView2Environment.CreateAsync(browserExecutableFolder: null, AppPaths.UserData, options);
     }
+
+    /// <summary>Engine flags from Settings > Advanced (GPU switch + the user's own flags). Applied at startup.</summary>
+    public static string BrowserArguments()
+    {
+        var s = Settings.SettingsService.Current;
+        var args = new List<string>();
+        if (!s.GpuAcceleration) args.Add("--disable-gpu");
+        if (!string.IsNullOrWhiteSpace(s.BrowserFlags)) args.Add(s.BrowserFlags.Trim());
+        return string.Join(' ', args);
+    }
+
+    /// <summary>The flags the running engine was started with (to tell the user a restart is pending).</summary>
+    public static string? StartedWith { get; private set; }
 
     /// <summary>Installed WebView2 runtime version, or null if the runtime is missing.</summary>
     public static string? RuntimeVersion()

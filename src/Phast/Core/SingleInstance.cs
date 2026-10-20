@@ -45,6 +45,14 @@ public static class SingleInstance
         return false;
     }
 
+    /// <summary>Lets a new Phast process become the main instance (used when restarting).</summary>
+    public static void Release()
+    {
+        try { _mutex?.ReleaseMutex(); } catch (ApplicationException) { /* not owned */ }
+        _mutex?.Dispose();
+        _mutex = null;
+    }
+
     private static async Task ListenLoop()
     {
         while (true)

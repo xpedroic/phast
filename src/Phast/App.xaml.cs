@@ -19,7 +19,11 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        if (!SingleInstance.TryAcquire(e.Args))
+        // Restarting (to apply engine flags): wait until the previous Phast and its engine have closed.
+        var restartArg = e.Args.FirstOrDefault(a => a.StartsWith(AppRestart.Argument, StringComparison.Ordinal));
+        if (restartArg != null) AppRestart.WaitForPrevious(restartArg);
+
+        if (!SingleInstance.TryAcquire(e.Args.Where(a => a != restartArg).ToArray()))
         {
             Shutdown();
             return;
@@ -37,6 +41,8 @@ public partial class App : Application
 
         AppPaths.EnsureCreated();
         SettingsService.Load();
+        Shortcuts = ShortcutMap.Create(SettingsService.Current.Shortcuts);
+        SettingsService.Changed += () => Shortcuts = ShortcutMap.Create(SettingsService.Current.Shortcuts);
         _ = BrowserEnvironment.GetAsync();   // start the engine now, in parallel with the UI
         Adblock.AdblockService.Start();      // load filter lists in the background
         ThemeManager.Initialize();
@@ -56,6 +62,7 @@ public partial class App : Application
             Dispatcher.BeginInvoke(() => SessionManager.HandleExternalLaunch(ParseUrls(args)));
 
         SessionManager.Start(ParseUrls(e.Args));
+        Tabs.TabSleeper.Start();
     }
 
     protected override void OnExit(ExitEventArgs e)

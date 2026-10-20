@@ -140,6 +140,17 @@ public static class BookmarkStore
                 n.Title.Contains(w, StringComparison.OrdinalIgnoreCase) || n.Url.Contains(w, StringComparison.OrdinalIgnoreCase)));
     }
 
+    /// <summary>Replaces all bookmarks (configuration import).</summary>
+    public static void ReplaceAll(BookmarkData data)
+    {
+        data.Bar.Id = BookmarkData.BarId;
+        data.Other.Id = BookmarkData.OtherId;
+        data.Bar.Children ??= [];
+        data.Other.Children ??= [];
+        _data = data;
+        OnChanged();
+    }
+
     // ---------------------------------------------------------------- persistence
 
     private static void OnChanged()

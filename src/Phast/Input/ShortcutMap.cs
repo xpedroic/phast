@@ -28,9 +28,23 @@ public static class Commands
     public const string DarkMode = "darkMode";
     /// <summary>"tab1".."tab8": jump to the n-th tab.</summary>
     public static string GoToTab(int n) => "tab" + n;
+
+    /// <summary>Every configurable command with its name in the Settings shortcut editor (in display order).</summary>
+    public static readonly IReadOnlyList<(string Id, string Name)> All =
+    [
+        (NewTab, "Nueva pestaña"), (NewWindow, "Nueva ventana"), (CloseTab, "Cerrar pestaña"), (ReopenTab, "Reabrir pestaña cerrada"),
+        (NextTab, "Pestaña siguiente"), (PreviousTab, "Pestaña anterior"),
+        (GoToTab(1), "Ir a la pestaña 1"), (GoToTab(2), "Ir a la pestaña 2"), (GoToTab(3), "Ir a la pestaña 3"), (GoToTab(4), "Ir a la pestaña 4"),
+        (GoToTab(5), "Ir a la pestaña 5"), (GoToTab(6), "Ir a la pestaña 6"), (GoToTab(7), "Ir a la pestaña 7"), (GoToTab(8), "Ir a la pestaña 8"),
+        (LastTab, "Ir a la última pestaña"), (FocusAddressBar, "Ir a la barra de direcciones"), (Reload, "Recargar"),
+        (HardReload, "Recargar sin caché"), (Back, "Atrás"), (Forward, "Adelante"), (Home, "Página de inicio"),
+        (Bookmark, "Añadir a marcadores"), (ToggleBookmarksBar, "Mostrar u ocultar la barra de marcadores"), (BookmarkManager, "Gestor de marcadores"),
+        (DarkMode, "Modo oscuro en esta web"), (FullScreen, "Pantalla completa"), (Print, "Imprimir"), (DevTools, "Herramientas para desarrolladores"),
+        (Settings, "Configuración"),
+    ];
 }
 
-/// <summary>A key + modifiers combination, e.g. Ctrl+Shift+T.</summary>
+/// <summary>A key + modifiers combination, e.g. Ctrl+Shift+T. Text form: "Ctrl+Alt+Shift+Key" (Key = WPF key name).</summary>
 public readonly record struct Shortcut(Key Key, ModifierKeys Modifiers)
 {
     public override string ToString()
@@ -42,11 +56,33 @@ public readonly record struct Shortcut(Key Key, ModifierKeys Modifiers)
         parts.Add(Key switch
         {
             >= Key.D0 and <= Key.D9 => ((int)(Key - Key.D0)).ToString(),
-            Key.Left => "←",
-            Key.Right => "→",
+            Key.PageDown => "PageDown",   // same value as Key.Next
+            Key.PageUp => "PageUp",       // same value as Key.Prior
+            Key.Enter => "Enter",         // same value as Key.Return
             _ => Key.ToString(),
         });
         return string.Join("+", parts);
+    }
+
+    /// <summary>Parses the text form ("Ctrl+Shift+T", "Alt+Left", "F5", "Ctrl+1"). Returns null if invalid.</summary>
+    public static Shortcut? Parse(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        var mods = ModifierKeys.None;
+        Key? key = null;
+        foreach (var raw in text.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            switch (raw.ToLowerInvariant())
+            {
+                case "ctrl" or "control": mods |= ModifierKeys.Control; continue;
+                case "alt": mods |= ModifierKeys.Alt; continue;
+                case "shift" or "mayús" or "mayus": mods |= ModifierKeys.Shift; continue;
+            }
+            if (raw.Length == 1 && char.IsAsciiDigit(raw[0])) key = Key.D0 + (raw[0] - '0');
+            else if (Enum.TryParse<Key>(raw, ignoreCase: true, out var k)) key = k;
+            else return null;
+        }
+        return key is { } kk && kk != Key.None ? new Shortcut(kk, mods) : null;
     }
 }
 
@@ -100,6 +136,22 @@ public sealed class ShortcutMap
     }
 
     public void Bind(string command, Key key, ModifierKeys modifiers) => _map[new Shortcut(key, modifiers)] = command;
+
+    /// <summary>Defaults with the user's overrides applied (an override replaces every default shortcut of its command).</summary>
+    public static ShortcutMap Create(IReadOnlyDictionary<string, string> overrides)
+    {
+        var m = CreateDefault();
+        foreach (var (command, text) in overrides)
+        {
+            foreach (var key in m._map.Where(kv => kv.Value == command).Select(kv => kv.Key).ToList()) m._map.Remove(key);
+            if (Shortcut.Parse(text) is { } s) m._map[s] = command; // also takes it away from any other command
+        }
+        return m;
+    }
+
+    /// <summary>All shortcuts of a command, as text.</summary>
+    public IEnumerable<string> ShortcutsOf(string command) =>
+        _map.Where(kv => kv.Value == command).Select(kv => kv.Key.ToString());
 
     public string? Find(Key key, ModifierKeys modifiers) =>
         _map.TryGetValue(new Shortcut(key, modifiers), out var cmd) ? cmd : null;

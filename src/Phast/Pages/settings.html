@@ -25,6 +25,7 @@
       <a href="#privacy"><svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>Privacidad y anuncios</a>
       <a href="#groups"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"/></svg>Grupos de páginas</a>
       <a href="#startup"><svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17-1.42 1.42A6.92 6.92 0 0 1 19 12c0 3.87-3.13 7-7 7a7 7 0 0 1-4.42-12.42L6.17 5.17A8.93 8.93 0 0 0 3 12a9 9 0 0 0 18 0c0-2.74-1.23-5.18-3.17-6.83z"/></svg>Al iniciar</a>
+      <a href="#advanced"><svg viewBox="0 0 24 24"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>Avanzado</a>
       <a href="#about"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Información de Phast</a>
     </nav>
 
@@ -154,6 +155,115 @@
         </div>
       </section>
 
+      <section id="advanced">
+        <h2>Avanzado</h2>
+        <div class="card">
+          <div class="row">
+            <div class="label">Modo desarrollador
+              <small>Muestra opciones para ajustar Phast a fondo: rendimiento, monitor de pestañas, atajos, filtros, ajustes por web y opciones del motor</small></div>
+            <label class="toggle"><input type="checkbox" data-setting="developerMode"><span></span></label>
+          </div>
+        </div>
+
+        <div id="devPanels" hidden>
+          <div class="banner" id="restartBanner" hidden>
+            Hay cambios que se aplican al reiniciar Phast.
+            <button class="btn" data-dev="restart">Reiniciar ahora</button>
+          </div>
+
+          <h3>Rendimiento</h3>
+          <div class="card">
+            <div class="row">
+              <div class="label">Suspender pestañas en segundo plano tras (minutos)
+                <small>El motor congela la pestaña: no gasta CPU y libera memoria. Vuelve al instante al abrirla. 0 = nunca.</small></div>
+              <input type="number" min="0" max="1440" class="num" data-setting="sleepAfterMinutes">
+            </div>
+            <div class="row">
+              <div class="label">Dormir del todo las pestañas tras (minutos)
+                <small>Se libera la pestaña por completo (se recarga al abrirla). Conserva dirección y título. 0 = nunca.</small></div>
+              <input type="number" min="0" max="10080" class="num" data-setting="discardAfterMinutes">
+            </div>
+            <div class="row">
+              <div class="label">Límite de pestañas cargadas
+                <small>Por encima de este número se duermen las que llevas más tiempo sin usar. 0 = sin límite.</small></div>
+              <input type="number" min="0" max="200" class="num" data-setting="maxLoadedTabs">
+            </div>
+            <div class="row">
+              <div class="label">Aceleración por GPU<small>Desactívala solo si ves fallos gráficos. Se aplica al reiniciar.</small></div>
+              <label class="toggle"><input type="checkbox" data-setting="gpuAcceleration"><span></span></label>
+            </div>
+          </div>
+
+          <h3>Monitor de pestañas</h3>
+          <div class="card">
+            <div class="monitor-summary" id="monitorSummary">Cargando...</div>
+            <table class="monitor">
+              <thead><tr><th>Pestaña</th><th>Estado</th><th>Memoria</th><th>CPU</th><th>Bloqueados</th><th></th></tr></thead>
+              <tbody id="monitorRows"></tbody>
+            </table>
+            <details class="processes"><summary>Procesos del motor</summary><table class="monitor"><tbody id="processRows"></tbody></table></details>
+          </div>
+
+          <h3>Atajos de teclado</h3>
+          <div class="card">
+            <div class="row">
+              <div class="label">Pulsa "Cambiar" y después la nueva combinación de teclas (Esc para cancelar)</div>
+              <button class="btn" data-dev="resetShortcuts">Restablecer todos</button>
+            </div>
+            <div id="shortcutRows"></div>
+          </div>
+
+          <h3>Bloqueo de anuncios avanzado</h3>
+          <div class="card pad">
+            <label class="field-label">Mis reglas <small>(sintaxis de Adblock Plus / uBlock: <code>||dominio.com^</code> bloquea, <code>@@||dominio.com^$document</code> permite un sitio, <code>dominio.com##.clase</code> oculta)</small></label>
+            <textarea id="customRules" class="code" rows="6" spellcheck="false"></textarea>
+            <div class="inline-form">
+              <input id="domainInput" placeholder="dominio.com">
+              <button class="btn" data-dev="blockDomain">Bloquear dominio</button>
+              <button class="btn" data-dev="allowDomain">Permitir dominio</button>
+            </div>
+            <label class="field-label">Listas de filtros adicionales <small>(una dirección por línea)</small></label>
+            <textarea id="customLists" class="code" rows="3" spellcheck="false" placeholder="https://ejemplo.com/mi-lista.txt"></textarea>
+            <div class="inline-form"><button class="btn" data-dev="saveFilters">Guardar y aplicar</button>
+              <span class="muted">Para ver lo bloqueado en cada pestaña, pulsa su número en el monitor.</span></div>
+          </div>
+
+          <h3>Ajustes por web</h3>
+          <div class="card">
+            <div class="row">
+              <div class="label">Desactivar JavaScript, cambiar el navegador que dice ser (user agent) o añadir tu CSS y JavaScript a una web</div>
+              <div class="inline-form"><input id="siteInput" placeholder="ejemplo.com"><button class="btn" data-dev="addSite">Añadir web</button></div>
+            </div>
+          </div>
+          <div id="siteRows"></div>
+
+          <h3>Opciones del motor (flags)</h3>
+          <div class="card">
+            <div id="flagRows"></div>
+            <div class="row" style="display:block">
+              <label class="field-label">Todas las opciones (argumentos de Chromium/WebView2, separados por espacios)</label>
+              <textarea id="flagsText" class="code" rows="2" spellcheck="false"></textarea>
+              <div class="inline-form"><button class="btn" data-dev="saveFlags">Guardar</button><span class="muted">Se aplican al reiniciar Phast.</span></div>
+            </div>
+          </div>
+
+          <h3>Herramientas</h3>
+          <div class="card">
+            <div class="row"><div class="label">Herramientas para desarrolladores (F12) de una pestaña<small>También desde el monitor, con el botón &lt;/&gt; de cada pestaña. Incluyen la consola.</small></div></div>
+            <div class="row"><div class="label">Exportar toda la configuración (ajustes y marcadores) a un archivo</div><button class="btn" data-dev="export">Exportar</button></div>
+            <div class="row"><div class="label">Importar la configuración desde un archivo<small>Sustituye tus ajustes y marcadores actuales</small></div><button class="btn" data-dev="import">Importar</button></div>
+            <div class="row"><div class="label">Carpeta de datos de Phast<small id="dataFolder"></small></div><button class="btn" data-dev="openData">Abrir</button></div>
+            <div class="row"><div class="label">Reiniciar Phast<small>Guarda las pestañas y vuelve a abrir el navegador</small></div><button class="btn" data-dev="restart">Reiniciar</button></div>
+          </div>
+        </div>
+      </section>
+
+      <dialog id="blockedDialog" class="list-dialog">
+        <h3 id="blockedTitle"></h3>
+        <pre id="blockedList"></pre>
+        <form method="dialog"><button class="btn">Cerrar</button></form>
+      </dialog>
+
       <section id="about">
         <h2>Información de Phast</h2>
         <div class="card">
@@ -176,5 +286,6 @@
 
   <script src="js/phast.js"></script>
   <script src="js/settings.js"></script>
+  <script src="js/developer.js"></script>
 </body>
 </html>

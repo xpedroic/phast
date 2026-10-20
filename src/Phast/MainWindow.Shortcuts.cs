@@ -11,6 +11,11 @@ public partial class MainWindow
     {
         // Alt combinations arrive as Key.System; WebView2 forwards its accelerator keys here as well.
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (Developer.ShortcutCapture.Active && Developer.ShortcutCapture.TryCapture(key, Keyboard.Modifiers))
+        {
+            e.Handled = true;
+            return;
+        }
         var command = App.Shortcuts.Find(key, Keyboard.Modifiers);
         if (command != null && Execute(command)) e.Handled = true;
     }

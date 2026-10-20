@@ -119,7 +119,7 @@
   // ---- send changes back
   for (const el of controls()) {
     el.addEventListener("change", () => {
-      const value = el.type === "checkbox" ? el.checked : el.value;
+      const value = el.type === "checkbox" ? el.checked : el.type === "number" ? Math.max(0, parseInt(el.value || "0", 10)) : el.value;
       phast.send("settings.set", { key: el.dataset.setting, value });
     });
   }

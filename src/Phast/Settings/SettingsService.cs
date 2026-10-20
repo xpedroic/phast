@@ -48,6 +48,14 @@ public static class SettingsService
         return true;
     }
 
+    /// <summary>Replaces every setting at once (configuration import).</summary>
+    public static void ReplaceAll(AppSettings settings)
+    {
+        Current = settings;
+        Save();
+        Changed?.Invoke();
+    }
+
     /// <summary>Settings as a JSON object (camelCase), for the settings page.</summary>
     public static JsonNode ToJson() => JsonSerializer.SerializeToNode(Current, JsonFile.Options)!;
 
