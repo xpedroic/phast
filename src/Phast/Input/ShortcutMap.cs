@@ -25,6 +25,7 @@ public static class Commands
     public const string Bookmark = "bookmark";
     public const string ToggleBookmarksBar = "toggleBookmarksBar";
     public const string BookmarkManager = "bookmarkManager";
+    public const string DarkMode = "darkMode";
     /// <summary>"tab1".."tab8": jump to the n-th tab.</summary>
     public static string GoToTab(int n) => "tab" + n;
 }
@@ -94,6 +95,7 @@ public sealed class ShortcutMap
         m.Bind(Commands.Bookmark, Key.D, C);
         m.Bind(Commands.ToggleBookmarksBar, Key.B, C | S);
         m.Bind(Commands.BookmarkManager, Key.O, C | S);
+        m.Bind(Commands.DarkMode, Key.D, C | S);
         return m;
     }
 

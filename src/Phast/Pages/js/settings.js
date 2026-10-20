@@ -14,9 +14,24 @@
       else if (el.type === "radio") el.checked = el.value === value;
       else el.value = value;
     }
+    renderDarkSites(msg.settings);
     document.getElementById("version").textContent = msg.version || "";
     document.getElementById("engineVersion").textContent = msg.engineVersion || "";
   });
+
+  // ---- dark mode: sites with dark mode (or excluded from "all sites")
+  function renderDarkSites(s) {
+    const all = s.darkAllSites;
+    const list = all ? s.darkExcludedSites : s.darkSites;
+    document.getElementById("darkListTitle").textContent = all ? "Webs sin modo oscuro" : "Webs con modo oscuro";
+    const box = document.getElementById("darkSites");
+    const safe = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    box.innerHTML = list.length === 0
+      ? `<div class="row"><div class="label"><small>${all ? "Ninguna: todas las webs se ven en oscuro." : "Ninguna todavía. Pulsa la luna de la barra en una web para oscurecerla."}</small></div></div>`
+      : list.map((d) => `<div class="row"><div class="label">${safe(d)}</div><button class="btn" data-dark-remove="${safe(d)}">Quitar</button></div>`).join("");
+    box.querySelectorAll("[data-dark-remove]").forEach((b) =>
+      b.addEventListener("click", () => phast.send("dark.remove", { site: b.dataset.darkRemove })));
+  }
 
   // ---- send changes back
   for (const el of controls()) {

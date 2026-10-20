@@ -42,6 +42,7 @@ public partial class App : Application
         ThemeManager.Initialize();
         InternalPages.EnsureExtracted();
         Bridge.PageBridge.Initialize();
+        Dark.DarkModeService.Initialize();
         Omnibox.SuggestionProvider.BookmarkSource = text => Bookmarks.BookmarkStore.Search(text).Take(3).Select(b => new Omnibox.Suggestion
         {
             Kind = Omnibox.SuggestionKind.Bookmark,

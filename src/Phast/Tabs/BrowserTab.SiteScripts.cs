@@ -22,17 +22,24 @@ public sealed partial class BrowserTab
     private void OnNavigationStartingSiteScripts(object? sender, CoreWebView2NavigationStartingEventArgs e)
     {
         if (!Uri.TryCreate(e.Uri, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https")) return;
-        var missing = SiteScripts.For(uri.Host.ToLowerInvariant()).Where(s => !_siteScripts.ContainsKey(s.Id)).ToList();
-        if (missing.Count == 0) return;
+        var host = uri.Host.ToLowerInvariant();
+        var missing = SiteScripts.For(host).Where(s => !_siteScripts.ContainsKey(s.Id)).ToList();
+        var needDark = NeedsDarkRegistration(host);
+        if (missing.Count == 0 && !needDark) return;
 
         e.Cancel = true;
-        _ = RegisterThenNavigateAsync(missing, e.Uri);
+        _ = RegisterThenNavigateAsync(missing, needDark, e.Uri);
     }
 
-    private async Task RegisterThenNavigateAsync(List<SiteScript> scripts, string url)
+    private async Task RegisterThenNavigateAsync(List<SiteScript> scripts, bool dark, string url)
     {
         var core = Core;
         if (core == null) return;
+        if (dark)
+        {
+            try { await RegisterDarkScriptAsync(); }
+            catch (Exception ex) { Log.Write($"Dark mode script failed: {ex.Message}"); }
+        }
         foreach (var script in scripts)
         {
             try

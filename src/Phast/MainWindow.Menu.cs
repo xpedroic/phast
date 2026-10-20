@@ -33,6 +33,10 @@ public partial class MainWindow
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("Imprimir...", "", Commands.Print));
         menu.Items.Add(Item("Pantalla completa", "", Commands.FullScreen));
+        var dark = Item("Modo oscuro en esta web", "", Commands.DarkMode);
+        dark.IsChecked = Tabs.Active?.IsDarkForced == true;
+        dark.IsEnabled = DarkButton.IsEnabled;
+        menu.Items.Add(dark);
         menu.Items.Add(Item("Herramientas para desarrolladores", "", Commands.DevTools));
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("Configuración", "", Commands.Settings));

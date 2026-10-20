@@ -53,6 +53,11 @@ public static class PageBridge
                     AdblockBridge.Handle(tab, type, root);
                     break;
 
+                case "dark.remove":
+                    var site = root.GetProperty("site").GetString() ?? "";
+                    SettingsService.Update(s => { s.DarkSites.Remove(site); s.DarkExcludedSites.Remove(site); });
+                    break;
+
                 case "openPage":
                     // Internal pages asking to open another internal page (e.g. settings -> bookmarks manager).
                     var page = root.GetProperty("url").GetString() ?? "";

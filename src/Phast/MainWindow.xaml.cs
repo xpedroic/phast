@@ -45,6 +45,7 @@ public partial class MainWindow : Window
         InitTabDrag();
         InitBookmarks();
         InitAdblockUi();
+        InitDarkModeUi();
 
         _omnibox = new Omnibox.OmniboxController(AddressBox, SuggestPopup, SuggestList, NavigateFromOmnibox);
         AddressBox.PreviewTextInput += (_, _) => _lastAddressTyping = DateTime.Now;
@@ -149,6 +150,7 @@ public partial class MainWindow : Window
         UpdateAddressBar(force: true);
         UpdateTitle();
         UpdateShield();
+        UpdateDarkButton();
 
         // On a new tab page the cursor goes straight to the address bar, like Chrome.
         if (_observedTab != null && InternalPages.IsNewTab(_observedTab.Url))
@@ -175,6 +177,10 @@ public partial class MainWindow : Window
             case nameof(BrowserTab.BlockedCount):
             case nameof(BrowserTab.BlockingActive):
                 UpdateShield();
+                break;
+            case nameof(BrowserTab.IsDarkForced):
+            case nameof(BrowserTab.DocumentHost):
+                UpdateDarkButton();
                 break;
         }
     }

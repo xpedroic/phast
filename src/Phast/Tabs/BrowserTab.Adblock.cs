@@ -75,6 +75,7 @@ public sealed partial class BrowserTab
     private void OnWebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
     {
         // This runs for every request of the page: keep it as cheap as possible.
+        if (TryHandleCssProxy(e)) return;
         if (!_blockingActive || _env == null) return;
         var engine = AdblockService.Engine;
         if (engine == null) return;

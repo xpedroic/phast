@@ -44,6 +44,15 @@ The WebView2 Runtime itself is part of Windows and is not redistributed by Phast
 
 ---
 
+## Dark Reader (instant dark mode)
+
+- Source: https://github.com/darkreader/darkreader (npm package `darkreader` 4.9.133)
+- License: MIT — full text in `src/Phast/Pages/scripts/darkreader.LICENSE.txt`
+- Copyright (c) 2026 Dark Reader Ltd.
+- Bundled unmodified as `src/Phast/Pages/scripts/darkreader.js`; loaded only on sites where the user turns dark mode on.
+
+---
+
 ## Mozilla Readability
 
 - Source: https://github.com/mozilla/readability

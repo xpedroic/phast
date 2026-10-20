@@ -13,6 +13,8 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - [ ] Funciones v1 (1–11)
   - [x] 1 Pestañas (hecho en la Fase 1)
   - [ ] 4 Historial y descargas → el usuario pidió dejarla PARA EL FINAL (después de la 11)
+  - [ ] 7 Modo lectura → SALTADA por petición del usuario (preguntarle al final si la quiere)
+  - [x] 8 Modo oscuro instantáneo: Dark Reader (MIT) en Pages/scripts/darkreader.js, solo se carga en webs con modo oscuro; luna en la barra + Ctrl+Mayús+D; se recuerda por sitio (dominio); "todas las webs" con excepciones en Apariencia; proxy de CSS/imágenes limitado (Dark/CssProxy.cs) para hojas de estilo de otros servidores.
   - [x] 6 CAMBIO DECIDIDO POR EL USUARIO: Phast NO tendrá soporte de extensiones (ni gestor de extensiones en ajustes). En su lugar, lo que hacen uBlock Origin Lite y TwiBlocker va INTEGRADO de serie y debe funcionar incluso mejor. Hecho:
     - Twitch: vaft (TwitchAdSolutions, MIT, fork mantenido ryanbr) en Pages/scripts/twitch-vaft.js, se registra solo al entrar en twitch.tv, se actualiza cada 2 días (Adblock/SiteScripts.cs).
     - YouTube: script propio Pages/scripts/youtube-adblock.js (quita adPlacements/playerAds/adSlots, salta anuncios, oculta anuncios del feed).

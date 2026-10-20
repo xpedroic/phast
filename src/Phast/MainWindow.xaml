@@ -166,6 +166,9 @@
 
                 <!-- Extension / action icons will live here. -->
                 <StackPanel x:Name="ActionsBar" DockPanel.Dock="Right" Orientation="Horizontal">
+                    <!-- Instant dark mode for the current site -->
+                    <Button x:Name="DarkButton" Style="{StaticResource ToolbarButton}" Content="&#xE708;" Click="Dark_Click"
+                            ToolTip="Modo oscuro en esta web (Ctrl+Mayús+D)"/>
                     <!-- Ad blocker: shield with the number of blocked requests on this page -->
                     <Button x:Name="ShieldButton" Style="{StaticResource ToolbarButton}" Click="Shield_Click"
                             ToolTip="Bloqueador de anuncios">

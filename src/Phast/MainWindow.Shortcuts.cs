@@ -66,6 +66,7 @@ public partial class MainWindow
                 Settings.SettingsService.Update(s => s.ShowBookmarksBar = !s.ShowBookmarksBar);
                 return true;
             case Commands.BookmarkManager: OpenInternalPage("phast://bookmarks"); return true;
+            case Commands.DarkMode: ToggleDarkMode(); return true;
             case Commands.Home:tab?.Navigate(Core.InternalPages.ToRealUrl(Core.InternalPages.NewTab)); return true;
         }
 

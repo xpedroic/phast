@@ -137,6 +137,7 @@ public sealed partial class BrowserTab : ObservableObject
 
         InitSiteScripts(core);
         InitAdblock(core, env);
+        InitDarkMode(core);
         try { await InitCosmeticAsync(core); }
         catch (Exception ex) { Log.Write($"Cosmetic init failed: {ex.Message}"); }
         if (WebView != webView) return;

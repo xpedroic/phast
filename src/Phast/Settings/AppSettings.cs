@@ -14,6 +14,14 @@ public sealed class AppSettings
     public ThemeMode Theme { get; set; } = ThemeMode.System;
     public bool ShowBookmarksBar { get; set; } = true;
 
+    // Instant dark mode for web pages (Ctrl+Shift+D)
+    /// <summary>Sites (registrable domains) where dark mode is forced.</summary>
+    public List<string> DarkSites { get; set; } = [];
+    /// <summary>Force dark mode on every site...</summary>
+    public bool DarkAllSites { get; set; }
+    /// <summary>...except these (when <see cref="DarkAllSites"/> is on).</summary>
+    public List<string> DarkExcludedSites { get; set; } = [];
+
     // Search
     public string SearchEngine { get; set; } = "google";
     /// <summary>Ask the search engine for suggestions while typing in the address bar.</summary>
