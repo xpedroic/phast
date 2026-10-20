@@ -76,6 +76,13 @@ public static class AdblockService
             // The user's own rules (Settings > Advanced) come last.
             engine.AddList(SettingsService.Current.CustomFilterRules.Split('\n'));
             engine.Compile();
+            // Parsing ~4 MB of lists leaves a lot of short-lived garbage: release it a little later, when startup is
+            // over (a full GC briefly pauses every thread, including the one drawing the window).
+            _ = Task.Delay(TimeSpan.FromSeconds(8)).ContinueWith(_ =>
+            {
+                System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
+                GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+            }, TaskScheduler.Default);
             BuildTime = sw.Elapsed;
             BuiltAt = DateTime.Now;
             _engine = engine;

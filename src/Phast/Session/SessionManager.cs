@@ -34,7 +34,9 @@ public static class SessionManager
 
     public static MainWindow OpenWindow(SessionWindow? restore = null, IEnumerable<string>? urls = null)
     {
+        Core.Log.Write($"Startup: creating window at {Core.Log.SinceStart:F0} ms");
         var window = new MainWindow(restore, urls);
+        Core.Log.Write($"Startup: window built at {Core.Log.SinceStart:F0} ms");
         _windows.Add(window);
         window.Closing += (_, _) => OnWindowClosing(window);
         window.Closed += (_, _) => OnWindowClosed(window);

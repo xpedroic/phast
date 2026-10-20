@@ -61,7 +61,9 @@ public partial class App : Application
         SingleInstance.ArgumentsReceived += args =>
             Dispatcher.BeginInvoke(() => SessionManager.HandleExternalLaunch(ParseUrls(args)));
 
+        Log.Write($"Startup: settings and engine requested at {Log.SinceStart:F0} ms");
         SessionManager.Start(ParseUrls(e.Args));
+        Log.Write($"Startup: window shown at {Log.SinceStart:F0} ms");
         Tabs.TabSleeper.Start();
     }
 

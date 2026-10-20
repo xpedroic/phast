@@ -62,7 +62,7 @@ public sealed class AppSettings
 
     // Performance
     /// <summary>Background tabs are suspended (frozen, memory trimmed) after this many minutes. 0 = never.</summary>
-    public int SleepAfterMinutes { get; set; } = 10;
+    public int SleepAfterMinutes { get; set; } = 5;
     /// <summary>Background tabs are fully unloaded (keeping URL and title) after this many minutes. 0 = never.</summary>
     public int DiscardAfterMinutes { get; set; } = 60;
     /// <summary>Maximum loaded tabs; the least recently used background tabs are unloaded beyond it. 0 = no limit.</summary>

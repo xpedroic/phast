@@ -11,6 +11,9 @@ public static class Log
     public static readonly bool Enabled = Environment.GetEnvironmentVariable("PHAST_LOG") == "1";
     private static readonly object Sync = new();
 
+    /// <summary>Milliseconds since the process started (startup profiling).</summary>
+    public static double SinceStart => (DateTime.Now - System.Diagnostics.Process.GetCurrentProcess().StartTime).TotalMilliseconds;
+
     public static void Write(string message)
     {
         System.Diagnostics.Debug.WriteLine(message);

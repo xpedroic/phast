@@ -24,6 +24,7 @@ public partial class MainWindow : Window
     public MainWindow(SessionWindow? restore = null, IEnumerable<string>? urls = null)
     {
         InitializeComponent();
+        Log.Write($"Startup:   XAML loaded at {Log.SinceStart:F0} ms");
 
         _frame = new WindowFrame(this, RootGrid, MaximizeButton);
         Tabs = new TabManager(WebHost);
@@ -60,6 +61,7 @@ public partial class MainWindow : Window
         LocationChanged += (_, _) => _omnibox.Close();
         SizeChanged += (_, _) => _omnibox.Close();
 
+        Log.Write($"Startup:   window parts ready at {Log.SinceStart:F0} ms");
         RestoreTabs(restore, urls);
         OnWindowStateChanged();
     }
@@ -399,6 +401,10 @@ public partial class MainWindow : Window
 
     private void OnWindowStateChanged()
     {
+        // Minimized: let the engine treat the page as hidden (throttled, memory trimmed) and shrink our own process.
+        Tabs.Active?.SetMinimized(WindowState == WindowState.Minimized);
+        if (WindowState == WindowState.Minimized) Interop.MemoryTrim.TrimSoon();
+
         var max = WindowState == WindowState.Maximized;
         MaximizeButton.Content = max ? "" : "";
         MaximizeButton.ToolTip = max ? "Restaurar" : "Maximizar";

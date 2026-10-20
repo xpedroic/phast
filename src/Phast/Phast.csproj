@@ -24,7 +24,9 @@
 
     <!-- Startup performance -->
     <TieredPGO>true</TieredPGO>
-    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- Memory: a browser shell is mostly idle, so prefer a small heap over GC throughput. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>    <InvariantGlobalization>false</InvariantGlobalization>
     <SatelliteResourceLanguages>en;es</SatelliteResourceLanguages>
     <!-- Don't ship the XML API docs of NuGet packages. -->
     <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
@@ -34,6 +36,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ask the GC to keep the heap compact (0-9; higher = smaller heap, slightly more GC work). -->
+    <RuntimeHostConfigurationOption Include="System.GC.ConserveMemory" Value="5" />
   </ItemGroup>
 
   <ItemGroup>

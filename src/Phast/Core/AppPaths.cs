@@ -8,8 +8,14 @@ namespace Phast.Core;
 /// </summary>
 public static class AppPaths
 {
+    /// <summary>
+    /// Data folder. Developers can set PHAST_DATA_DIR to run a separate, independent Phast (own profile and
+    /// own single-instance lock), e.g. for tests and benchmarks next to the everyday one.
+    /// </summary>
     public static string Root { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Phast");
+        Environment.GetEnvironmentVariable("PHAST_DATA_DIR") is { Length: > 0 } custom
+            ? Path.GetFullPath(custom)
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Phast");
 
     /// <summary>WebView2 profile data (cookies, cache, local storage...).</summary>
     public static string UserData => Path.Combine(Root, "User Data");

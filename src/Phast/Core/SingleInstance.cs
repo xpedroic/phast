@@ -11,7 +11,18 @@ namespace Phast.Core;
 /// </summary>
 public static class SingleInstance
 {
-    private static readonly string Id = $"Phast-{Environment.UserName}";
+    // One instance per user and data folder (a custom PHAST_DATA_DIR gets its own instance).
+    private static readonly string Id = Environment.GetEnvironmentVariable("PHAST_DATA_DIR") is { Length: > 0 }
+        ? $"Phast-{Environment.UserName}-{StableHash(AppPaths.Root.ToLowerInvariant()):x16}"
+        : $"Phast-{Environment.UserName}";
+
+    /// <summary>FNV-1a: unlike string.GetHashCode it is the same in every process.</summary>
+    private static ulong StableHash(string s)
+    {
+        ulong h = 14695981039346656037UL;
+        foreach (var c in s) { h ^= c; h *= 1099511628211UL; }
+        return h;
+    }
     private static readonly string MutexName = $@"Local\{Id}";
     private static readonly string PipeName = Id;
     private static Mutex? _mutex;

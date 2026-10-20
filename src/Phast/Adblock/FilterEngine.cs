@@ -12,6 +12,11 @@ namespace Phast.Adblock;
 /// </summary>
 public sealed class FilterEngine
 {
+    private readonly HashSet<ulong> _blockHostHashes = new();
+    private readonly HashSet<ulong> _allowHostHashes = new();
+    /// <summary>Stand-ins returned for matches found in the compact host hash sets.</summary>
+    private static readonly NetRule SimpleBlock = new() { Pattern = "" };
+    private static readonly NetRule SimpleAllow = new() { Pattern = "", IsException = true };
     private readonly Dictionary<ulong, List<NetRule>> _blockHosts = new();
     private readonly Dictionary<ulong, List<NetRule>> _allowHosts = new();
     private readonly Dictionary<ulong, List<NetRule>> _blockTokens = new();
@@ -71,6 +76,12 @@ public sealed class FilterEngine
 
         if (rule.IsPureHost(out var host))
         {
+            // Most rules are a bare "||host^" without options: keep only a 64-bit hash of the host (saves ~30 MB).
+            if (rule is { Types: ResourceType.AllButDocument, Party: Party.Any, IncludeDomains: null, ExcludeDomains: null, Important: false })
+            {
+                (rule.IsException ? _allowHostHashes : _blockHostHashes).Add(Hash(host));
+                return;
+            }
             rule.Host = host;
             var hosts = rule.IsException ? _allowHosts : _blockHosts;
             var key = Hash(host);
@@ -248,15 +259,15 @@ public sealed class FilterEngine
 
         var thirdParty = !Domains.SameSite(host.ToString(), docHost);
 
-        var block = Find(_blockHosts, _blockTokens, _blockGeneric, lower, host, hostStart, hostEnd, docHost, type, thirdParty, _hasImportant);
+        var block = Find(_blockHostHashes, SimpleBlock, _blockHosts, _blockTokens, _blockGeneric, lower, host, hostStart, hostEnd, docHost, type, thirdParty, _hasImportant);
         if (block == null) return null;
         if (block.Important) return block;
-        var allow = Find(_allowHosts, _allowTokens, _allowGeneric, lower, host, hostStart, hostEnd, docHost, type, thirdParty, false);
+        var allow = Find(_allowHostHashes, SimpleAllow, _allowHosts, _allowTokens, _allowGeneric, lower, host, hostStart, hostEnd, docHost, type, thirdParty, false);
         return allow == null ? block : null;
     }
 
     /// <param name="keepLookingForImportant">If true, a normal match doesn't end the search (an $important rule may still match).</param>
-    private static NetRule? Find(Dictionary<ulong, List<NetRule>> hosts, Dictionary<ulong, List<NetRule>> tokens, List<NetRule> generic,
+    private static NetRule? Find(HashSet<ulong> hostHashes, NetRule simple, Dictionary<ulong, List<NetRule>> hosts, Dictionary<ulong, List<NetRule>> tokens, List<NetRule> generic,
         string url, ReadOnlySpan<char> host, int hostStart, int hostEnd, string docHost, ResourceType type, bool thirdParty,
         bool keepLookingForImportant)
     {
@@ -265,7 +276,13 @@ public sealed class FilterEngine
         // 1) Hostname table: "ads.example.com" checks "ads.example.com", "example.com", "com".
         for (var h = host; ; )
         {
-            if (hosts.TryGetValue(Hash(h), out var list))
+            var hash = Hash(h);
+            if (hostHashes.Contains(hash))
+            {
+                if (!keepLookingForImportant) return simple;
+                found ??= simple;
+            }
+            if (hosts.TryGetValue(hash, out var list))
                 foreach (var r in list)
                     if (h.SequenceEqual(r.Host) && r.MatchesContext(type, thirdParty, docHost))
                     {

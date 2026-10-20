@@ -18,6 +18,15 @@ public sealed partial class BrowserTab
     public string StateLabel =>
         IsActive ? "Activa" : !HasWebView ? "Dormida" : IsSuspended ? "Suspendida" : "En segundo plano";
 
+    /// <summary>The window was minimized/restored: hide the page from the engine while nobody can see it.</summary>
+    public void SetMinimized(bool minimized)
+    {
+        if (WebView == null || !IsActive) return;
+        WebView.Visibility = minimized ? System.Windows.Visibility.Hidden : System.Windows.Visibility.Visible;
+        if (Core != null)
+            Core.MemoryUsageTargetLevel = minimized ? CoreWebView2MemoryUsageTargetLevel.Low : CoreWebView2MemoryUsageTargetLevel.Normal;
+    }
+
     /// <summary>Asks the engine to freeze this background tab. Returns false if it refused (e.g. audio playing).</summary>
     public async Task<bool> TrySuspendAsync()
     {

@@ -130,6 +130,7 @@ public sealed partial class BrowserTab : ObservableObject
         core.NavigationCompleted += (_, e) =>
         {
             IsLoading = false;
+            if (_firstLoad) { _firstLoad = false; Log.Write($"Startup: first page loaded at {Log.SinceStart:F0} ms ({core.Source})"); }
             if (e.IsSuccess) HistoryStore.AddVisitAsync(core.Source, core.DocumentTitle, _typedPending).Forget();
             _typedPending = false;
         };
@@ -161,6 +162,7 @@ public sealed partial class BrowserTab : ObservableObject
 
     /// <summary>True when the next navigation was typed in the address bar (ranks higher in suggestions).</summary>
     private bool _typedPending;
+    private static bool _firstLoad = true;
 
     public void Navigate(string url, bool typed = false)
     {

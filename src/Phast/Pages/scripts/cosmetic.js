@@ -37,9 +37,19 @@
   const start = () => {
     collect(document.documentElement);
     flush(true);
+    // Busy pages add nodes constantly: only remember them here and scan them in batches, when the page is idle.
+    let added = [];
+    const scan = () => {
+      timer = 0;
+      const nodes = added;
+      added = [];
+      for (const n of nodes) if (n.isConnected) collect(n);
+      flush();
+    };
     new MutationObserver((mutations) => {
-      for (const m of mutations) for (const n of m.addedNodes) collect(n);
-      if (pending.length && !timer) timer = setTimeout(flush, 250);
+      for (const m of mutations) for (const n of m.addedNodes) if (n.nodeType === 1) added.push(n);
+      if (added.length && !timer)
+        timer = window.requestIdleCallback ? requestIdleCallback(scan, { timeout: 500 }) : setTimeout(scan, 250);
     }).observe(document.documentElement, { childList: true, subtree: true });
   };
 
