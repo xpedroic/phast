@@ -21,6 +21,7 @@ public static class PageBridge
         SettingsService.Changed += () => Broadcast(SettingsMessage(), "settings.html");
         BookmarksBridge.Initialize();
         AdblockBridge.Initialize();
+        HistoryBridge.Initialize();
     }
 
     public static void Handle(BrowserTab tab, string json)
@@ -53,6 +54,11 @@ public static class PageBridge
                                    || type.StartsWith("tab.", StringComparison.Ordinal) || type.StartsWith("shortcuts.", StringComparison.Ordinal)
                                    || type.StartsWith("site.", StringComparison.Ordinal):
                     DeveloperBridge.Handle(tab, type, root);
+                    break;
+
+                case not null when type.StartsWith("history.", StringComparison.Ordinal) || type.StartsWith("downloads.", StringComparison.Ordinal)
+                                   || type.StartsWith("browsingData.", StringComparison.Ordinal):
+                    HistoryBridge.Handle(tab, type, root);
                     break;
 
                 case not null when type.StartsWith("adblock.", StringComparison.Ordinal):

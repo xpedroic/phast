@@ -16,7 +16,7 @@ Lo que lo hace especial:
 
 - **Consume poco**: las pestañas en segundo plano se duermen solas y las pestañas restauradas no se cargan hasta que las abres.
 - **Bloqueador de anuncios integrado**, activado desde el primer momento.
-- **Modo lectura** y **modo oscuro instantáneo** para cualquier web.
+- **Modo oscuro instantáneo** para cualquier web y bloqueo de anuncios de **YouTube y Twitch** integrado.
 - **Grupos de páginas**: abre "Trabajo" u "Ocio" con un clic.
 - **Importa tus marcadores de Chrome** con un clic.
 - **Modo desarrollador** en los ajustes: atajos, rendimiento, filtros, CSS/JS por sitio, flags del motor… todo desde la interfaz, sin tocar archivos de configuración.
@@ -94,7 +94,7 @@ Highlights:
 
 - **Low resource usage**: background tabs go to sleep automatically and restored tabs are not loaded until you open them.
 - **Built-in ad blocker**, on by default.
-- **Reader mode** and **instant dark mode** for any website.
+- **Instant dark mode** for any website, and built-in **YouTube and Twitch ad blocking**.
 - **Page groups**: open "Work" or "Fun" with a single click.
 - **One-click import of your Chrome bookmarks.**
 - **Developer mode** in Settings: shortcuts, performance, filter lists, per-site CSS/JS, engine flags… all from the UI, no config files to edit.

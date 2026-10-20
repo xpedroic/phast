@@ -15,6 +15,8 @@
       else el.value = value;
     }
     renderDarkSites(msg.settings);
+    if (document.activeElement !== document.getElementById("startupPages"))
+      document.getElementById("startupPages").value = (msg.settings.startupPages || []).join("\n");
     renderGroups(msg.settings.pageGroups);
     document.getElementById("version").textContent = msg.version || "";
     document.getElementById("engineVersion").textContent = msg.engineVersion || "";
@@ -216,6 +218,17 @@
   });
   document.getElementById("adblockUpdate").addEventListener("click", () => phast.send("adblock.update"));
 
+  // ---- startup pages, downloads, links to internal pages
+  document.getElementById("startupPages").addEventListener("change", (e) => {
+    const pages = e.target.value.split("\n").map((u) => u.trim()).filter(Boolean);
+    phast.send("settings.set", { key: "startupPages", value: pages });
+    if (pages.length) phast.send("settings.set", { key: "startup", value: "pages" });
+  });
+  phast.on("downloads", (m) => { document.getElementById("downloadFolder").textContent = m.folder; });
+  document.getElementById("chooseFolder").addEventListener("click", () => phast.send("downloads.chooseFolder"));
+  document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => phast.send("openPage", { url: b.dataset.open })));
+
+  phast.send("downloads.get");
   phast.send("settings.get");
   phast.send("bookmarks.sources");
   phast.send("adblock.status");

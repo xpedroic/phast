@@ -26,6 +26,9 @@ public static class Commands
     public const string ToggleBookmarksBar = "toggleBookmarksBar";
     public const string BookmarkManager = "bookmarkManager";
     public const string DarkMode = "darkMode";
+    public const string History = "history";
+    public const string Downloads = "downloads";
+    public const string ClearData = "clearData";
     /// <summary>"tab1".."tab8": jump to the n-th tab.</summary>
     public static string GoToTab(int n) => "tab" + n;
 
@@ -39,7 +42,7 @@ public static class Commands
         (LastTab, "Ir a la última pestaña"), (FocusAddressBar, "Ir a la barra de direcciones"), (Reload, "Recargar"),
         (HardReload, "Recargar sin caché"), (Back, "Atrás"), (Forward, "Adelante"), (Home, "Página de inicio"),
         (Bookmark, "Añadir a marcadores"), (ToggleBookmarksBar, "Mostrar u ocultar la barra de marcadores"), (BookmarkManager, "Gestor de marcadores"),
-        (DarkMode, "Modo oscuro en esta web"), (FullScreen, "Pantalla completa"), (Print, "Imprimir"), (DevTools, "Herramientas para desarrolladores"),
+        (DarkMode, "Modo oscuro en esta web"), (History, "Historial"), (Downloads, "Descargas"), (ClearData, "Borrar datos de navegación"), (FullScreen, "Pantalla completa"), (Print, "Imprimir"), (DevTools, "Herramientas para desarrolladores"),
         (Settings, "Configuración"),
     ];
 }
@@ -132,6 +135,9 @@ public sealed class ShortcutMap
         m.Bind(Commands.ToggleBookmarksBar, Key.B, C | S);
         m.Bind(Commands.BookmarkManager, Key.O, C | S);
         m.Bind(Commands.DarkMode, Key.D, C | S);
+        m.Bind(Commands.History, Key.H, C);
+        m.Bind(Commands.Downloads, Key.J, C);
+        m.Bind(Commands.ClearData, Key.Delete, C | S);
         return m;
     }
 

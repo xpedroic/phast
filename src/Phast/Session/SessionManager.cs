@@ -20,7 +20,14 @@ public static class SessionManager
     /// <summary>Opens the startup windows (restored session and/or URLs from the command line).</summary>
     public static void Start(IReadOnlyList<string> urls)
     {
-        var session = SettingsService.Current.Startup == StartupMode.RestoreSession ? SessionStore.Load() : new SessionData();
+        var settings = SettingsService.Current;
+        if (settings.Startup == StartupMode.Pages && settings.StartupPages.Count > 0)
+        {
+            var pages = settings.StartupPages.Select(Core.UrlResolver.Resolve).OfType<string>().Concat(urls).ToList();
+            OpenWindow(null, pages);
+            return;
+        }
+        var session = settings.Startup == StartupMode.RestoreSession ? SessionStore.Load() : new SessionData();
         var restored = session.Windows.Where(w => w.Tabs.Count > 0).ToList();
 
         if (restored.Count == 0)

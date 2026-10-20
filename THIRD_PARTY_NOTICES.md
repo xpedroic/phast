@@ -53,15 +53,6 @@ The WebView2 Runtime itself is part of Windows and is not redistributed by Phast
 
 ---
 
-## Mozilla Readability
-
-- Source: https://github.com/mozilla/readability
-- License: Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
-- Copyright (c) 2010 Arc90 Inc and Mozilla contributors.
-- Used by Reader mode. The full Apache 2.0 license text is shipped next to the bundled file (`Readability.LICENSE.md`).
-
----
-
 ## Ad-block filter lists (EasyList, EasyPrivacy, EasyList Spanish, EasyList Cookie List)
 
 - EasyList, EasyPrivacy, EasyList Spanish — https://easylist.to/ — dual-licensed GPLv3 / Creative Commons Attribution-ShareAlike 3.0 Unported (https://easylist.to/pages/licence.html). Copyright: The EasyList authors.

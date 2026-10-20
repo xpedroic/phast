@@ -2,7 +2,7 @@ namespace Phast.Settings;
 
 public enum ThemeMode { System, Light, Dark }
 
-public enum StartupMode { RestoreSession, NewTab }
+public enum StartupMode { RestoreSession, NewTab, Pages }
 
 /// <summary>A saved group of pages ("Trabajo", "Ocio"...) opened together from the toolbar.</summary>
 public sealed class PageGroup
@@ -53,6 +53,15 @@ public sealed class AppSettings
 
     // Startup
     public StartupMode Startup { get; set; } = StartupMode.RestoreSession;
+
+    /// <summary>Pages opened at startup when <see cref="Startup"/> is <see cref="StartupMode.Pages"/>.</summary>
+    public List<string> StartupPages { get; set; } = [];
+
+    // Downloads
+    /// <summary>Download folder ("" = the Windows Downloads folder).</summary>
+    public string DownloadFolder { get; set; } = "";
+    /// <summary>Ask where to save every download.</summary>
+    public bool AskWhereToSave { get; set; }
 
     // Page groups
     public List<PageGroup> PageGroups { get; set; } = [];

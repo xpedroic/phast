@@ -27,6 +27,8 @@ public partial class MainWindow
         reopen.IsEnabled = Tabs.HasClosedTabs;
         menu.Items.Add(reopen);
         menu.Items.Add(new Separator());
+        menu.Items.Add(Item("Historial", "", Commands.History));
+        menu.Items.Add(Item("Descargas", "", Commands.Downloads));
         menu.Items.Add(BuildBookmarksItem());
         menu.Items.Add(new Separator());
         menu.Items.Add(BuildZoomItem());
@@ -39,6 +41,7 @@ public partial class MainWindow
         menu.Items.Add(dark);
         menu.Items.Add(Item("Herramientas para desarrolladores", "", Commands.DevTools));
         menu.Items.Add(new Separator());
+        menu.Items.Add(Item("Borrar datos de navegación...", "", Commands.ClearData));
         menu.Items.Add(Item("Configuración", "", Commands.Settings));
         var exit = new MenuItem { Header = "Salir", Icon = Glyph("") };
         exit.Click += (_, _) => SessionManager.ExitAll();

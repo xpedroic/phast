@@ -142,6 +142,7 @@ public sealed partial class BrowserTab : ObservableObject
         core.IsDocumentPlayingAudioChanged += (_, _) => IsAudible = core.IsDocumentPlayingAudio;
         core.IsMutedChanged += (_, _) => IsMuted = core.IsMuted;
         core.WebMessageReceived += OnWebMessageReceived;
+        core.DownloadStarting += (_, e) => Downloads.DownloadManager.OnDownloadStarting(e);
 
         InitSiteScripts(core);
         InitAdblock(core, env);

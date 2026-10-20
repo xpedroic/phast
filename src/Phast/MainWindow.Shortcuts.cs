@@ -72,6 +72,9 @@ public partial class MainWindow
                 return true;
             case Commands.BookmarkManager: OpenInternalPage("phast://bookmarks"); return true;
             case Commands.DarkMode: ToggleDarkMode(); return true;
+            case Commands.History: OpenInternalPage("phast://history"); return true;
+            case Commands.Downloads: OpenInternalPage("phast://downloads"); return true;
+            case Commands.ClearData: OpenInternalPage("phast://history#clear"); return true;
             case Commands.Home:tab?.Navigate(Core.InternalPages.ToRealUrl(Core.InternalPages.NewTab)); return true;
         }
 

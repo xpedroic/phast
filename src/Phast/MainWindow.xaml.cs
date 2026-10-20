@@ -47,6 +47,7 @@ public partial class MainWindow : Window
         InitBookmarks();
         InitAdblockUi();
         InitDarkModeUi();
+        InitDownloadsUi();
 
         _omnibox = new Omnibox.OmniboxController(AddressBox, SuggestPopup, SuggestList, NavigateFromOmnibox);
         AddressBox.PreviewTextInput += (_, _) => _lastAddressTyping = DateTime.Now;

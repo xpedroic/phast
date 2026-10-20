@@ -12,9 +12,8 @@ El usuario no programa: Claude hace todo (código, compilar, probar, arreglar). 
 - [x] Fase 1: base (ventana tipo Chrome, pestañas, navegación, barra de direcciones)
 - [ ] Funciones v1 (1–11)
   - [x] 1 Pestañas (hecho en la Fase 1)
-  - [ ] 4 Historial y descargas → el usuario pidió dejarla PARA EL FINAL (después de la 11)
-  - [ ] 7 Modo lectura → SALTADA por petición del usuario (preguntarle al final si la quiere)
-  - [ ] 10 Ajustes completos + 4 Historial y descargas → se harán JUNTAS (decisión del usuario), después de la 11.
+  - [-] 7 Modo lectura → SUPRIMIDA por decisión del usuario (no se hará; no usar Mozilla Readability)
+  - [x] 10 + 4: phast://history (Ctrl+H, por días, buscar, borrar, "Borrar datos de navegación" Ctrl+Mayús+Supr), phast://downloads (Ctrl+J, gestor propio: pausar/reanudar/cancelar, carpeta, preguntar dónde guardar; botón con anillo de progreso), ajustes: Descargas, Al iniciar con páginas concretas, Historial y datos. Sección "Extensiones" no existe (decisión del usuario).
   - [x] 11 Modo desarrollador (ajustes#advanced, oculto hasta activar): rendimiento (suspender/dormir/límite pestañas, GPU) con Tabs/TabSleeper.cs; monitor RAM/CPU por pestaña (Developer/TabMonitor.cs); atajos configurables con captura; reglas y listas propias de adblock y "ver bloqueado"; ajustes por web (JS off, user agent, CSS/JS, oscuro); flags del motor + reinicio (Core/AppRestart.cs); exportar/importar configuración (Developer/ConfigBackup.cs). Sin probar: exportar/importar (abre diálogo de archivos).
   - [x] 9 Grupos de páginas: ajustes#groups (nombre, color, URLs, "añadir pestañas abiertas"), botón en la barra; grupos de pestañas con etiqueta de color plegable (TabManager.Groups.cs, StripItems), menú contextual de pestañas y de grupo; se guardan en la sesión.
   - [x] 8 Modo oscuro instantáneo: Dark Reader (MIT) en Pages/scripts/darkreader.js, solo se carga en webs con modo oscuro; luna en la barra + Ctrl+Mayús+D; se recuerda por sitio (dominio); "todas las webs" con excepciones en Apariencia; proxy de CSS/imágenes limitado (Dark/CssProxy.cs) para hojas de estilo de otros servidores.

@@ -167,6 +167,66 @@ public static class HistoryStore
         cmd.ExecuteNonQuery();
     });
 
+    /// <summary>One visit for the history page.</summary>
+    public sealed record Visit(long Id, string Url, string Title, DateTime Time);
+
+    /// <summary>Visits newest first, older than <paramref name="beforeMs"/> (Unix ms; 0 = now), optionally filtered by text.</summary>
+    public static Task<List<Visit>> VisitsAsync(string? query, long beforeMs, int limit = 150) => Run(db =>
+    {
+        using var cmd = db.CreateCommand();
+        var where = new List<string> { "v.time < $before" };
+        cmd.Parameters.AddWithValue("$before", beforeMs > 0 ? beforeMs : long.MaxValue);
+        var words = (query ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < words.Length; i++)
+        {
+            where.Add($"(u.url LIKE $w{i} ESCAPE '\\' OR u.title LIKE $w{i} ESCAPE '\\')");
+            cmd.Parameters.AddWithValue($"$w{i}", "%" + EscapeLike(words[i]) + "%");
+        }
+        cmd.CommandText = $"""
+            SELECT v.id, u.url, u.title, v.time FROM visits v JOIN urls u ON u.id = v.url_id
+            WHERE {string.Join(" AND ", where)} ORDER BY v.time DESC LIMIT {limit};
+            """;
+        var list = new List<Visit>();
+        using var r = cmd.ExecuteReader();
+        while (r.Read())
+            list.Add(new Visit(r.GetInt64(0), r.GetString(1), r.GetString(2), DateTimeOffset.FromUnixTimeMilliseconds(r.GetInt64(3)).LocalDateTime));
+        return list;
+    });
+
+    /// <summary>Deletes single visits (and URLs left without visits).</summary>
+    public static Task DeleteVisitsAsync(IReadOnlyCollection<long> ids) => Run(db =>
+    {
+        using var tx = db.BeginTransaction();
+        foreach (var id in ids)
+        {
+            using var cmd = db.CreateCommand();
+            cmd.CommandText = "DELETE FROM visits WHERE id = $id;";
+            cmd.Parameters.AddWithValue("$id", id);
+            cmd.ExecuteNonQuery();
+        }
+        using (var clean = db.CreateCommand())
+        {
+            clean.CommandText = "DELETE FROM urls WHERE id NOT IN (SELECT DISTINCT url_id FROM visits);";
+            clean.ExecuteNonQuery();
+        }
+        tx.Commit();
+    });
+
+    /// <summary>Deletes all history since a moment (DateTime.MinValue = everything).</summary>
+    public static Task ClearAsync(DateTime since) => Run(db =>
+    {
+        var ms = since == DateTime.MinValue ? 0 : new DateTimeOffset(since).ToUnixTimeMilliseconds();
+        using var cmd = db.CreateCommand();
+        cmd.CommandText = """
+            DELETE FROM visits WHERE time >= $since;
+            DELETE FROM urls WHERE id NOT IN (SELECT DISTINCT url_id FROM visits);
+            UPDATE urls SET visit_count = (SELECT COUNT(*) FROM visits WHERE url_id = urls.id);
+            """;
+        cmd.Parameters.AddWithValue("$since", ms);
+        cmd.ExecuteNonQuery();
+        if (ms == 0) Exec(db, "VACUUM;");
+    });
+
     private static List<HistoryEntry> ReadEntries(SqliteCommand cmd)
     {
         var list = new List<HistoryEntry>();

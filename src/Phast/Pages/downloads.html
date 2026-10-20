@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Descargas</title>
+  <link rel="icon" href="img/phast.png">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/list.css">
+</head>
+<body>
+  <header>
+    <img src="img/phast.png" alt="">
+    <h1>Descargas</h1>
+    <label class="search">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input id="search" type="search" placeholder="Buscar en las descargas">
+    </label>
+    <div class="spacer"></div>
+    <button class="btn" id="clearAll">Borrar todo</button>
+  </header>
+  <main>
+    <div id="list"></div>
+  </main>
+  <script src="js/phast.js"></script>
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const size = (b) => b >= 1073741824 ? (b / 1073741824).toFixed(1) + " GB" : b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+      let data = { items: [] }, query = "";
+
+      function render() {
+        const items = data.items.filter((d) => !query || (d.name + " " + d.url).toLowerCase().includes(query));
+        if (items.length === 0) { $("list").innerHTML = `<div class="card"><div class="empty">${query ? "No hay resultados" : "Aquí aparecerán tus descargas"}</div></div>`; return; }
+        $("list").innerHTML = `<div class="card">${items.map((d) => {
+          const pct = d.total > 0 ? Math.round(d.received * 100 / d.total) : 0;
+          const status = { progress: d.total ? `${size(d.received)} de ${size(d.total)} · ${pct} %` : `${size(d.received)} descargados`,
+            paused: `En pausa · ${size(d.received)}${d.total ? " de " + size(d.total) : ""}`, done: d.exists ? size(d.received) : "Eliminado",
+            failed: "Error en la descarga", canceled: "Cancelada" }[d.state];
+          const btn = (a, t) => `<button class="btn" data-a="${a}" data-id="${d.id}">${t}</button>`;
+          const buttons = d.state === "progress" ? btn("pause", "Pausar") + btn("cancel", "Cancelar")
+            : d.state === "paused" ? (d.canResume ? btn("resume", "Reanudar") : "") + btn("cancel", "Cancelar")
+            : (d.exists ? btn("folder", "Mostrar en la carpeta") : "") + btn("remove", "Quitar de la lista");
+          return `<div class="dl"><div class="file">📄</div><div class="info">
+            ${d.state === "done" && d.exists ? `<a class="name" href="#" data-a="open" data-id="${d.id}">${esc(d.name)}</a>` : `<span class="name ${d.state === "done" ? "gone" : ""}">${esc(d.name)}</span>`}
+            <div class="src" title="${esc(d.url)}">${esc(d.url)}</div>
+            ${d.state === "progress" || d.state === "paused" ? `<div class="bar"><div style="width:${pct}%"></div></div>` : ""}
+            <div class="status">${esc(status)}</div><div class="buttons">${buttons}</div></div></div>`;
+        }).join("")}</div>`;
+      }
+      phast.on("downloads", (m) => { data = m; render(); });
+      $("list").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-a]");
+        if (!b) return;
+        e.preventDefault();
+        phast.send("downloads.act", { id: b.dataset.id, action: b.dataset.a });
+      });
+      $("search").addEventListener("input", (e) => { query = e.target.value.trim().toLowerCase(); render(); });
+      $("clearAll").addEventListener("click", () => phast.send("downloads.clear"));
+      phast.send("downloads.get");
+    })();
+  </script>
+</body>
+</html>
